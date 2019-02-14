@@ -22,14 +22,16 @@
  * SOFTWARE.
  */
 
-package pw.stamina.pubsub4k
+package pw.stamina.pubsub4k.publish
 
-interface Publisher<in T : Any> {
+import pw.stamina.pubsub4k.subscribe.Subscription
+
+interface Publisher<T> {
 
     /**
-     * Returns all the subscriptions for this publisher.
+     * Returns all the subscriptions for this delegate.
      */
-    val subscriptions: Iterable<Subscription<T>>
+    val subscriptions: List<Subscription<T>>
 
     /**
      * Publishes the [message] to all its subscriptions.
