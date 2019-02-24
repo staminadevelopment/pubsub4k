@@ -28,6 +28,10 @@ import pw.stamina.pubsub4k.subscribe.Subscription
 
 sealed class OptimizedPublisher<T> : Publisher<T> {
 
+    abstract fun added(subscription: Subscription<T>): OptimizedPublisher<T>
+    
+    abstract fun removed(subscription: Subscription<T>): OptimizedPublisher<T>
+
     companion object {
         fun <T> fromSubscriptions(subscriptions: List<Subscription<T>>) = when (subscriptions.size) {
             0 -> EmptyPublisher()
@@ -35,7 +39,7 @@ sealed class OptimizedPublisher<T> : Publisher<T> {
             else -> ManySubscriptionsPublisher(subscriptions)
         }
 
-        fun <T> empty(): Publisher<T> {
+        fun <T> empty(): OptimizedPublisher<T> {
             return EmptyPublisher()
         }
     }
@@ -46,10 +50,13 @@ private class EmptyPublisher<T> : OptimizedPublisher<T>() {
     override val subscriptions = emptyList<Subscription<T>>()
 
     override fun publish(message: T) = Unit
+
+    override fun added(subscription: Subscription<T>) = SingleSubscriptionPublisher(subscription)
+    override fun removed(subscription: Subscription<T>) = this
 }
 
 private class SingleSubscriptionPublisher<T>(
-        subscription: Subscription<T>
+        private val subscription: Subscription<T>
 ) : OptimizedPublisher<T>() {
 
     private val messageHandler = subscription.messageHandler
@@ -57,6 +64,12 @@ private class SingleSubscriptionPublisher<T>(
     override val subscriptions = listOf(subscription)
 
     override fun publish(message: T) = messageHandler(message)
+
+    override fun added(subscription: Subscription<T>) =
+            ManySubscriptionsPublisher(subscriptions + subscription)
+
+    override fun removed(subscription: Subscription<T>) =
+            if (subscription == this.subscription) EmptyPublisher<T>() else this
 }
 
 private class ManySubscriptionsPublisher<T>(
@@ -66,4 +79,13 @@ private class ManySubscriptionsPublisher<T>(
     private val messageHandlers = subscriptions.map(Subscription<T>::messageHandler)
 
     override fun publish(message: T) = messageHandlers.forEach { handler -> handler(message) }
+
+    override fun added(subscription: Subscription<T>) =
+            ManySubscriptionsPublisher(subscriptions + subscription)
+
+    override fun removed(subscription: Subscription<T>): OptimizedPublisher<T> {
+        val subscriptions = subscriptions - subscription
+        return subscriptions.singleOrNull()?.let(::SingleSubscriptionPublisher)
+                ?: ManySubscriptionsPublisher(subscriptions)
+    }
 }

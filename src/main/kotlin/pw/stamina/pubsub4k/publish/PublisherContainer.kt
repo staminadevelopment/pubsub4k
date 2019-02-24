@@ -32,10 +32,10 @@ import pw.stamina.pubsub4k.subscribe.Subscription
  * class is useful if
  */
 class PublisherContainer<T>(
-        val topic: Topic<T>,
-        private var delegate: Publisher<T>,
-        private val factory: PublisherFactory
+        val topic: Topic<T>
 ) : Publisher<T> {
+
+    private var delegate = OptimizedPublisher.empty<T>()
 
     override val subscriptions: List<Subscription<T>>
         get() = delegate.subscriptions
@@ -45,8 +45,14 @@ class PublisherContainer<T>(
     }
 
     fun updateSubscriptions(subscriptions: List<Subscription<T>>) {
-        delegate = factory.createPublisher(subscriptions)
+        delegate = OptimizedPublisher.fromSubscriptions(subscriptions)
     }
 
-    // add, remove, clear?
+    fun add(subscription: Subscription<T>) {
+        delegate = delegate.added(subscription)
+    }
+
+    fun remove(subscription: Subscription<T>) {
+        delegate = delegate.removed(subscription)
+    }
 }
