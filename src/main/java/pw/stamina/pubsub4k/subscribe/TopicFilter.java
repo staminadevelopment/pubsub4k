@@ -22,19 +22,11 @@
  * SOFTWARE.
  */
 
-package pw.stamina.pubsub4k.subscribe
+package pw.stamina.pubsub4k.subscribe;
 
-inline fun <reified T> newSubscription() = Subscription.newSubscription(T::class.java)
+import org.jetbrains.annotations.NotNull;
 
-inline fun <reified T> newSubscription(
-        noinline contentFilter: ((T) -> Boolean)? = null,
-        noinline messageHandler: (T) -> Unit
-): Subscription<T> {
-    return newSubscription<T>()
-            .let { contentFilter?.let(it::filterContent) ?: it }
-            .build(messageHandler)
-}
+public interface TopicFilter<T> {
 
-operator fun <T, U> SubscriptionBuilder<T, U>.invoke(messageHandler: (U) -> Unit): Subscription<T> {
-    return build(messageHandler)
+    boolean accepts(@NotNull Class<? extends T> topic);
 }

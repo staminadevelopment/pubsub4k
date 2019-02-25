@@ -25,11 +25,12 @@
 package pw.stamina.pubsub4k.subscribe;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class Subscription<T> {
 
     @NotNull private final Class<T> topic;
-    private final boolean acceptSubtopics;
+    @Nullable private final TopicFilter<T> topicFilter;
 
     /**
      * Handler function for the messages received by this
@@ -39,10 +40,10 @@ public final class Subscription<T> {
 
     public Subscription(
             @NotNull Class<T> topic,
-            boolean acceptSubtopics,
+            @Nullable TopicFilter<T> topicFilter,
             @NotNull MessageHandler<T> messageHandler) {
         this.topic = topic;
-        this.acceptSubtopics = acceptSubtopics;
+        this.topicFilter = topicFilter;
         this.messageHandler = messageHandler;
     }
 
@@ -51,8 +52,9 @@ public final class Subscription<T> {
         return topic;
     }
 
-    public boolean getAcceptSubtopics() {
-        return acceptSubtopics;
+    @Nullable
+    public TopicFilter<T> getTopicFilter() {
+        return topicFilter;
     }
 
     @NotNull

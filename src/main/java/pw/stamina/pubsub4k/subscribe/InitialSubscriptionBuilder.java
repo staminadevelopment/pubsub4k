@@ -25,24 +25,26 @@
 package pw.stamina.pubsub4k.subscribe;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class InitialSubscriptionBuilder<T> extends SubscriptionBuilder<T, T> {
 
     @NotNull private final Class<T> topic;
-    private boolean acceptSubtopics;
+    @Nullable private TopicFilter<T> topicFilter;
 
     InitialSubscriptionBuilder(@NotNull Class<T> topic) {
         this.topic = topic;
     }
 
-    public SubscriptionBuilder<T, T> acceptSubtopics() {
-        acceptSubtopics = true;
+    @NotNull
+    public SubscriptionBuilder<T, T> rejectSubtopics() {
+        topicFilter = (topic) -> this.topic == topic;
         return this;
     }
 
     @NotNull
     @Override
     public Subscription<T> build(@NotNull MessageHandler<T> messageHandler) {
-        return new Subscription<>(topic, acceptSubtopics, messageHandler);
+        return new Subscription<>(topic, topicFilter, messageHandler);
     }
 }
