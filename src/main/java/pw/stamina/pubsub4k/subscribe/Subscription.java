@@ -51,7 +51,7 @@ public final class Subscription<T> {
         return topic;
     }
 
-    public boolean isAcceptSubtopics() {
+    public boolean getAcceptSubtopics() {
         return acceptSubtopics;
     }
 

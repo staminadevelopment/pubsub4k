@@ -63,7 +63,7 @@ private class SingleSubscriptionPublisher<T>(
 
     override val subscriptions = listOf(subscription)
 
-    override fun publish(message: T) = messageHandler(message)
+    override fun publish(message: T) = messageHandler.accept(message)
 
     override fun added(subscription: Subscription<T>) =
             ManySubscriptionsPublisher(subscriptions + subscription)
@@ -76,9 +76,9 @@ private class ManySubscriptionsPublisher<T>(
         override val subscriptions: List<Subscription<T>>
 ) : OptimizedPublisher<T>() {
 
-    private val messageHandlers = subscriptions.map(Subscription<T>::messageHandler)
+    private val messageHandlers = subscriptions.map { it.messageHandler }
 
-    override fun publish(message: T) = messageHandlers.forEach { handler -> handler(message) }
+    override fun publish(message: T) = messageHandlers.forEach { handler -> handler.accept(message) }
 
     override fun added(subscription: Subscription<T>) =
             ManySubscriptionsPublisher(subscriptions + subscription)
