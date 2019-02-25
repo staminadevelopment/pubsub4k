@@ -24,5 +24,12 @@
 
 package pw.stamina.pubsub4k.subscribe;
 
-public interface ContentFilterMapper<T, R> extends ContentFilter<T>, ContentMapper<T, R> {
+import org.jetbrains.annotations.NotNull;
+
+public interface ContentFilterMapper<T, R> {
+
+    boolean filter(@NotNull T message);
+
+    @NotNull
+    R map(@NotNull T message);
 }

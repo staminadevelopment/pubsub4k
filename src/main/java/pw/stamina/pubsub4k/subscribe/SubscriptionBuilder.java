@@ -45,7 +45,7 @@ public abstract class SubscriptionBuilder<T, U> {
     @NotNull
     public final <R> SubscriptionBuilder<T, R> filterMapped(@NotNull ContentFilterMapper<U, R> filterMapper) {
         return new DecoratedSubscriptionBuilder<>(this, (handler) -> (message) -> {
-            if (filterMapper.accepts(message)) handler.accept(filterMapper.apply(message));
+            if (filterMapper.filter(message)) handler.accept(filterMapper.map(message));
         });
     }
 

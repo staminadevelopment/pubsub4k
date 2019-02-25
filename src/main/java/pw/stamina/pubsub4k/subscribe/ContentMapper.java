@@ -27,7 +27,8 @@ package pw.stamina.pubsub4k.subscribe;
 import org.jetbrains.annotations.NotNull;
 
 @FunctionalInterface
-public interface ContentMapper<U, R> {
+public interface ContentMapper<T, R> {
 
-    R apply(@NotNull U message);
+    @NotNull
+    R apply(@NotNull T message);
 }
