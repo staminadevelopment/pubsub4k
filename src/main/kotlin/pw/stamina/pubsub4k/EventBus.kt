@@ -48,5 +48,6 @@ inline fun <reified T> EventBus.getPublisher(): Publisher<T> {
 
 typealias Topic<T> = Class<T>
 
-typealias ContentFilter<T> = (message: T) -> Boolean
+typealias ContentFilter<T> = T.() -> Boolean
+typealias ContentMapper<T, R> = T.() -> R
 typealias MessageHandler<T> = (message: T) -> Unit

@@ -26,7 +26,9 @@ package pw.stamina.pubsub4k.subscribe
 
 import pw.stamina.pubsub4k.ContentFilter
 import pw.stamina.pubsub4k.MessageHandler
+import pw.stamina.pubsub4k.MessageSubscriber
 import pw.stamina.pubsub4k.Topic
+import kotlin.properties.ReadOnlyProperty
 
 class Subscription<T>(
         val topic: Topic<T>,
@@ -40,32 +42,17 @@ class Subscription<T>(
         val messageHandler: MessageHandler<T>) {
 
     companion object {
+        inline fun <reified T> newSubscription() = InitialSubscriptionBuilder(T::class.java)
+
         inline fun <reified T> newSubscription(
-                noinline contentFilter: ContentFilter<T>? = null,
                 acceptSubtopics: Boolean = false,
+                noinline contentFilter: ContentFilter<T>? = null,
                 noinline messageHandler: MessageHandler<T>
-        ): Subscription<T> {
-            return internal_newSubscription(
-                    topic = T::class.java,
-                    contentFilter = contentFilter,
-                    acceptSubtopics = acceptSubtopics,
-                    messageHandler = messageHandler)
-        }
-
-        @Suppress("FunctionName")
-        fun <T> internal_newSubscription(
-                topic: Topic<T>,
-                contentFilter: ContentFilter<T>?,
-                acceptSubtopics: Boolean,
-                messageHandler: MessageHandler<T>
-        ): Subscription<T> {
-            val handler = if (contentFilter != null) {
-                { message -> if (contentFilter(message)) messageHandler(message) }
-            } else {
-                messageHandler
-            }
-
-            return Subscription(topic, acceptSubtopics, handler)
+        ): ReadOnlyProperty<MessageSubscriber, Subscription<T>> {
+            return newSubscription<T>()
+                    .let { if (acceptSubtopics) it.acceptSubtopics() else it }
+                    .let { contentFilter?.let(it::filterContent) ?: it }
+                    .build(messageHandler)
         }
     }
 }
