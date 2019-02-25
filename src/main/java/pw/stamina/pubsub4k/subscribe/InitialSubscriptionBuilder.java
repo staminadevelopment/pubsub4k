@@ -22,28 +22,27 @@
  * SOFTWARE.
  */
 
-package pw.stamina.pubsub4k
+package pw.stamina.pubsub4k.subscribe;
 
-import pw.stamina.pubsub4k.publish.Publisher
-import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
+import org.jetbrains.annotations.NotNull;
 
-interface EventBus {
+public final class InitialSubscriptionBuilder<T> extends SubscriptionBuilder<T, T> {
 
-    /**
-     * Returns the publisher associated with the [topic], if
-     * a publisher does not exist a new one is created.
-     */
-    fun <T> getPublisher(topic: Topic<T>): Publisher<T>
+    @NotNull private final Class<T> topic;
+    private boolean acceptSubtopics;
 
-    val subscriptions: SubscriptionRegistry
+    InitialSubscriptionBuilder(@NotNull Class<T> topic) {
+        this.topic = topic;
+    }
+
+    public SubscriptionBuilder<T, T> acceptSubtopics() {
+        acceptSubtopics = true;
+        return this;
+    }
+
+    @NotNull
+    @Override
+    public Subscription<T> build(@NotNull MessageHandler<T> messageHandler) {
+        return new Subscription<>(topic, acceptSubtopics, messageHandler);
+    }
 }
-
-/**
- * Returns the publisher associated with the [T] topic, if
- * a publisher does not exist a new one is created.
- */
-inline fun <reified T> EventBus.getPublisher(): Publisher<T> {
-    return this.getPublisher(T::class.java)
-}
-
-typealias Topic<T> = Class<T>

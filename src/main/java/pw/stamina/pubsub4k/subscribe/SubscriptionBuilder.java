@@ -22,28 +22,33 @@
  * SOFTWARE.
  */
 
-package pw.stamina.pubsub4k
+package pw.stamina.pubsub4k.subscribe;
 
-import pw.stamina.pubsub4k.publish.Publisher
-import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
+import org.jetbrains.annotations.NotNull;
 
-interface EventBus {
+public abstract class SubscriptionBuilder<T, U> {
 
-    /**
-     * Returns the publisher associated with the [topic], if
-     * a publisher does not exist a new one is created.
-     */
-    fun <T> getPublisher(topic: Topic<T>): Publisher<T>
+    @NotNull
+    public final SubscriptionBuilder<T, U> filterContent(@NotNull ContentFilter<U> filter) {
+        return new DecoratedSubscriptionBuilder<>(this, (handler) -> (message) -> {
+            if (filter.accepts(message)) handler.accept(message);
+        });
+    }
 
-    val subscriptions: SubscriptionRegistry
+    @NotNull
+    public final <R> SubscriptionBuilder<T, R> mapped(@NotNull ContentMapper<U, R> mapper) {
+        return new DecoratedSubscriptionBuilder<>(this, (handler) -> (message) -> {
+            handler.accept(mapper.apply(message));
+        });
+    }
+
+    @NotNull
+    public final <R> SubscriptionBuilder<T, R> filterMapped(@NotNull ContentFilterMapper<U, R> filterMapper) {
+        return new DecoratedSubscriptionBuilder<>(this, (handler) -> (message) -> {
+            if (filterMapper.accepts(message)) handler.accept(filterMapper.apply(message));
+        });
+    }
+
+    @NotNull
+    public abstract Subscription<T> build(MessageHandler<U> messageHandler);
 }
-
-/**
- * Returns the publisher associated with the [T] topic, if
- * a publisher does not exist a new one is created.
- */
-inline fun <reified T> EventBus.getPublisher(): Publisher<T> {
-    return this.getPublisher(T::class.java)
-}
-
-typealias Topic<T> = Class<T>

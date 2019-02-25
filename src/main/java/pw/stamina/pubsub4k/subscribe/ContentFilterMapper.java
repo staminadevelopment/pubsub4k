@@ -22,28 +22,7 @@
  * SOFTWARE.
  */
 
-package pw.stamina.pubsub4k
+package pw.stamina.pubsub4k.subscribe;
 
-import pw.stamina.pubsub4k.publish.Publisher
-import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
-
-interface EventBus {
-
-    /**
-     * Returns the publisher associated with the [topic], if
-     * a publisher does not exist a new one is created.
-     */
-    fun <T> getPublisher(topic: Topic<T>): Publisher<T>
-
-    val subscriptions: SubscriptionRegistry
+public interface ContentFilterMapper<T, R> extends ContentFilter<T>, ContentMapper<T, R> {
 }
-
-/**
- * Returns the publisher associated with the [T] topic, if
- * a publisher does not exist a new one is created.
- */
-inline fun <reified T> EventBus.getPublisher(): Publisher<T> {
-    return this.getPublisher(T::class.java)
-}
-
-typealias Topic<T> = Class<T>

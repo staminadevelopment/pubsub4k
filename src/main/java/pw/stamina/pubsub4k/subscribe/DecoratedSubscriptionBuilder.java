@@ -22,37 +22,25 @@
  * SOFTWARE.
  */
 
-package pw.stamina.pubsub4k.subscribe
+package pw.stamina.pubsub4k.subscribe;
 
-import pw.stamina.pubsub4k.ContentFilter
-import pw.stamina.pubsub4k.MessageHandler
-import pw.stamina.pubsub4k.MessageSubscriber
-import pw.stamina.pubsub4k.Topic
-import kotlin.properties.ReadOnlyProperty
+import org.jetbrains.annotations.NotNull;
 
-class Subscription<T>(
-        val topic: Topic<T>,
+public class DecoratedSubscriptionBuilder<T, U, R> extends SubscriptionBuilder<T, R> {
 
-        val acceptSubtopics: Boolean,
+    @NotNull private final SubscriptionBuilder<T, U> parent;
+    @NotNull private final HandlerDecorator<U, R> handlerDecorator;
 
-        /**
-         * Handler function for the messages received by this
-         * subscription.
-         */
-        val messageHandler: MessageHandler<T>) {
+    DecoratedSubscriptionBuilder(
+            @NotNull SubscriptionBuilder<T, U> parent,
+            @NotNull HandlerDecorator<U, R> handlerDecorator) {
+        this.parent = parent;
+        this.handlerDecorator = handlerDecorator;
+    }
 
-    companion object {
-        inline fun <reified T> newSubscription() = InitialSubscriptionBuilder(T::class.java)
-
-        inline fun <reified T> newSubscription(
-                acceptSubtopics: Boolean = false,
-                noinline contentFilter: ContentFilter<T>? = null,
-                noinline messageHandler: MessageHandler<T>
-        ): ReadOnlyProperty<MessageSubscriber, Subscription<T>> {
-            return newSubscription<T>()
-                    .let { if (acceptSubtopics) it.acceptSubtopics() else it }
-                    .let { contentFilter?.let(it::filterContent) ?: it }
-                    .build(messageHandler)
-        }
+    @NotNull
+    @Override
+    public Subscription<T> build(@NotNull MessageHandler<R> messageHandler) {
+        return parent.build(handlerDecorator.decorateHandler(messageHandler));
     }
 }
