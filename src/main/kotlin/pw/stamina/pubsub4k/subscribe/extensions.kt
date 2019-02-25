@@ -24,9 +24,11 @@
 
 package pw.stamina.pubsub4k.subscribe
 
-inline fun <reified T> newSubscription() = Subscription.newSubscription(T::class.java)
+import pw.stamina.pubsub4k.MessageSubscriber
 
-inline fun <reified T> newSubscription(
+inline fun <reified T> MessageSubscriber.newSubscription() = Subscription.newSubscription(T::class.java, this)
+
+inline fun <reified T> MessageSubscriber.newSubscription(
         noinline contentFilter: ((T) -> Boolean)? = null,
         noinline messageHandler: (T) -> Unit
 ): Subscription<T> {

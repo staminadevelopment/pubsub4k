@@ -26,10 +26,12 @@ package pw.stamina.pubsub4k.subscribe;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import pw.stamina.pubsub4k.MessageSubscriber;
 
 public final class Subscription<T> {
 
     @NotNull private final Class<T> topic;
+    @NotNull private final MessageSubscriber subscriber;
     @Nullable private final TopicFilter<T> topicFilter;
 
     /**
@@ -40,9 +42,11 @@ public final class Subscription<T> {
 
     public Subscription(
             @NotNull Class<T> topic,
+            @NotNull MessageSubscriber subscriber,
             @Nullable TopicFilter<T> topicFilter,
             @NotNull MessageHandler<T> messageHandler) {
         this.topic = topic;
+        this.subscriber = subscriber;
         this.topicFilter = topicFilter;
         this.messageHandler = messageHandler;
     }
@@ -50,6 +54,11 @@ public final class Subscription<T> {
     @NotNull
     public Class<T> getTopic() {
         return topic;
+    }
+
+    @NotNull
+    public MessageSubscriber getSubscriber() {
+        return subscriber;
     }
 
     @Nullable
@@ -63,7 +72,8 @@ public final class Subscription<T> {
     }
 
     @NotNull
-    public static <T> InitialSubscriptionBuilder<T> newSubscription(@NotNull Class<T> topic) {
-        return new InitialSubscriptionBuilder<>(topic);
+    public static <T> InitialSubscriptionBuilder<T> newSubscription(
+            @NotNull Class<T> topic, @NotNull MessageSubscriber subscriber) {
+        return new InitialSubscriptionBuilder<>(topic, subscriber);
     }
 }
