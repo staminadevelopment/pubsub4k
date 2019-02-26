@@ -25,27 +25,18 @@
 package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
+import pw.stamina.pubsub4k.publish.PublisherRegistry
+import pw.stamina.pubsub4k.subscribe.PublisherUpdatingSubscriptionRegistry
 import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
 
-interface EventBus {
+class StandardEventBus(
+        subscriptions: SubscriptionRegistry,
+        private val publishers: PublisherRegistry
+) : EventBus {
 
-    /**
-     * Returns the publisher associated with the [topic], if
-     * a publisher does not exist a new one is created.
-     */
-    fun <T> getPublisher(topic: Topic<T>): Publisher<T>
+    override val subscriptions = PublisherUpdatingSubscriptionRegistry(subscriptions, publishers)
 
-    val subscriptions: SubscriptionRegistry
+    override fun <T> getPublisher(topic: Topic<T>): Publisher<T> {
+        return publishers.findOrCreatePublisher(topic, subscriptions::findSubscriptionsForTopic)
+    }
 }
-
-/**
- * Returns the publisher associated with the [T] topic, if
- * a publisher does not exist a new one is created.
- */
-inline fun <reified T> EventBus.getPublisher(): Publisher<T> {
-    return this.getPublisher(T::class.java)
-}
-
-typealias Topic<T> = Class<T>
-
-fun Topic<*>.isSubtopicOf(other: Topic<*>) = other.isAssignableFrom(this)
