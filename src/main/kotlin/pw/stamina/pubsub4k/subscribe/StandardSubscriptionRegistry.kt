@@ -26,6 +26,7 @@ package pw.stamina.pubsub4k.subscribe
 
 import pw.stamina.pubsub4k.MessageSubscriber
 import pw.stamina.pubsub4k.Topic
+import pw.stamina.pubsub4k.isSubtopicOf
 
 class StandardSubscriptionRegistry : SubscriptionRegistry {
 
@@ -48,7 +49,7 @@ class StandardSubscriptionRegistry : SubscriptionRegistry {
 
     override fun <T> findSubscriptionsForTopic(topic: Topic<T>): Set<Subscription<T>> {
         return subscriberToSubscriptionMap.values.asSequence().flatten()
-                .filter { it.topic.isAssignableFrom(topic) }
+                .filter { topic.isSubtopicOf(it.topic) }
                 .filterIsInstance<Subscription<T>>()
                 .filter { it.topicFilter?.accepts(topic) != false }
                 .filterTo(mutableSetOf()) {

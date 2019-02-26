@@ -25,7 +25,8 @@
 package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
-import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
+import pw.stamina.pubsub4k.publish.StandardPublisherRegistry
+import pw.stamina.pubsub4k.subscribe.*
 
 interface EventBus {
 
@@ -47,3 +48,5 @@ inline fun <reified T> EventBus.getPublisher(): Publisher<T> {
 }
 
 typealias Topic<T> = Class<T>
+
+fun Topic<*>.isSubtopicOf(other: Topic<*>) = other.isAssignableFrom(this)
