@@ -34,7 +34,6 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation(kotlin("reflect"))
 }
 
 tasks.withType<KotlinCompile> {

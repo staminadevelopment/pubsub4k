@@ -26,10 +26,6 @@ package pw.stamina.pubsub4k.subscribe
 
 import pw.stamina.pubsub4k.MessageSubscriber
 import pw.stamina.pubsub4k.Topic
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.isSubtypeOf
-import kotlin.reflect.full.starProjectedType
-import kotlin.reflect.jvm.isAccessible
 
 interface SubscriptionRegistry {
 
@@ -45,10 +41,8 @@ interface SubscriptionRegistry {
 }
 
 fun SubscriptionRegistry.registerAllReflectively(subscriber: MessageSubscriber) {
-    val subscriberProperties = subscriber.javaClass.kotlin.declaredMemberProperties
-
-    val subscriptions = subscriberProperties.asSequence()
-            .filter { it.returnType.isSubtypeOf(Subscription::class.starProjectedType) }
+    val subscriptions = subscriber.javaClass.declaredFields.asSequence()
+            .filter { Subscription::class.java.isAssignableFrom(it.type) }
             .onEach { it.isAccessible = true }
             .map { it.get(subscriber) }
             .filterIsInstance<Subscription<*>>()
