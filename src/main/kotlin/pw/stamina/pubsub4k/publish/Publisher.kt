@@ -31,7 +31,7 @@ interface Publisher<T> {
     /**
      * Returns all the subscriptions for this delegate.
      */
-    val subscriptions: List<Subscription<T>>
+    val subscriptions: Set<Subscription<T>>
 
     /**
      * Publishes the [message] to all its subscriptions.

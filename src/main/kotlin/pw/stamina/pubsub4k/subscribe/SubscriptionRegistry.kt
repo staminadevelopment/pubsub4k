@@ -35,13 +35,13 @@ interface SubscriptionRegistry {
 
     fun register(subscription: Subscription<*>): Boolean
 
-    fun registerAll(subscriptions: Set<Subscription<*>>): Boolean
-
     fun unregister(subscription: Subscription<*>): Boolean
 
-    fun unregisterAll(subscriber: MessageSubscriber)
+    fun registerAll(subscriptions: Set<Subscription<*>>): Set<Subscription<*>>
 
-    fun <T> findSubscriptionsForTopic(topic: Topic<T>): List<Subscription<T>>
+    fun unregisterAll(subscriber: MessageSubscriber): Set<Subscription<*>>
+
+    fun <T> findSubscriptionsForTopic(topic: Topic<T>): Set<Subscription<T>>
 }
 
 fun SubscriptionRegistry.registerAllReflectively(subscriber: MessageSubscriber) {

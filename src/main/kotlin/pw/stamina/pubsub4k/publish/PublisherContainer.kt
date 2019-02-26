@@ -37,14 +37,14 @@ class PublisherContainer<T>(
 
     private var delegate = OptimizedPublisher.empty<T>()
 
-    override val subscriptions: List<Subscription<T>>
+    override val subscriptions: Set<Subscription<T>>
         get() = delegate.subscriptions
 
     override fun publish(message: T) {
         delegate.publish(message)
     }
 
-    fun updateSubscriptions(subscriptions: List<Subscription<T>>) {
+    fun updateSubscriptions(subscriptions: Set<Subscription<T>>) {
         delegate = OptimizedPublisher.fromSubscriptions(subscriptions)
     }
 

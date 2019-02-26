@@ -33,9 +33,9 @@ sealed class OptimizedPublisher<T> : Publisher<T> {
     abstract fun removed(subscription: Subscription<T>): OptimizedPublisher<T>
 
     companion object {
-        fun <T> fromSubscriptions(subscriptions: List<Subscription<T>>) = when (subscriptions.size) {
+        fun <T> fromSubscriptions(subscriptions: Set<Subscription<T>>) = when (subscriptions.size) {
             0 -> EmptyPublisher()
-            1 -> SingleSubscriptionPublisher(subscriptions[0])
+            1 -> SingleSubscriptionPublisher(subscriptions.single())
             else -> ManySubscriptionsPublisher(subscriptions)
         }
 
@@ -47,7 +47,7 @@ sealed class OptimizedPublisher<T> : Publisher<T> {
 
 private class EmptyPublisher<T> : OptimizedPublisher<T>() {
 
-    override val subscriptions = emptyList<Subscription<T>>()
+    override val subscriptions = emptySet<Subscription<T>>()
 
     override fun publish(message: T) = Unit
 
@@ -61,7 +61,7 @@ private class SingleSubscriptionPublisher<T>(
 
     private val messageHandler = subscription.messageHandler
 
-    override val subscriptions = listOf(subscription)
+    override val subscriptions = setOf(subscription)
 
     override fun publish(message: T) = messageHandler.accept(message)
 
@@ -73,7 +73,7 @@ private class SingleSubscriptionPublisher<T>(
 }
 
 private class ManySubscriptionsPublisher<T>(
-        override val subscriptions: List<Subscription<T>>
+        override val subscriptions: Set<Subscription<T>>
 ) : OptimizedPublisher<T>() {
 
     private val messageHandlers = subscriptions.map { it.messageHandler }
