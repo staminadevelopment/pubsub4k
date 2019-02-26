@@ -26,6 +26,7 @@ package pw.stamina.pubsub4k.subscribe;
 
 import org.jetbrains.annotations.NotNull;
 
+@FunctionalInterface
 public interface ContentFilter<T> {
 
     boolean accepts(@NotNull T message);

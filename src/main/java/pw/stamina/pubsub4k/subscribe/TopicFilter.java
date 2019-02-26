@@ -26,6 +26,7 @@ package pw.stamina.pubsub4k.subscribe;
 
 import org.jetbrains.annotations.NotNull;
 
+@FunctionalInterface
 public interface TopicFilter<T> {
 
     boolean accepts(@NotNull Class<? extends T> topic);
