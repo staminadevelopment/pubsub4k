@@ -48,8 +48,9 @@ class StandardSubscriptionRegistry : SubscriptionRegistry {
 
     override fun <T> findSubscriptionsForTopic(topic: Topic<T>): Set<Subscription<T>> {
         return subscriberToSubscriptionMap.values.asSequence().flatten()
-                .filter { topic.isAssignableFrom(it.topic) }
+                .filter { it.topic.isAssignableFrom(topic) }
                 .filterIsInstance<Subscription<T>>()
+                .filter { it.topicFilter?.accepts(topic) != false }
                 .filterTo(mutableSetOf()) {
                     it.topicFilter?.accepts(topic) != false
                 }
