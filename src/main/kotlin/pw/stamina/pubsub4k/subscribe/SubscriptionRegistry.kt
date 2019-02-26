@@ -33,11 +33,11 @@ import kotlin.reflect.jvm.isAccessible
 
 interface SubscriptionRegistry {
 
-    fun register(subscriber: MessageSubscriber, subscription: Subscription<*>)
+    fun register(subscription: Subscription<*>): Boolean
 
-    fun registerAll(subscriber: MessageSubscriber, subscriptions: Set<Subscription<*>>)
+    fun registerAll(subscriptions: Set<Subscription<*>>): Boolean
 
-    fun unregister(subscriber: MessageSubscriber, subscription: Subscription<*>)
+    fun unregister(subscription: Subscription<*>): Boolean
 
     fun unregisterAll(subscriber: MessageSubscriber)
 
@@ -54,5 +54,5 @@ fun SubscriptionRegistry.registerAllReflectively(subscriber: MessageSubscriber) 
             .filterIsInstance<Subscription<*>>()
             .toSet()
 
-    registerAll(subscriber, subscriptions)
+    registerAll(subscriptions)
 }
