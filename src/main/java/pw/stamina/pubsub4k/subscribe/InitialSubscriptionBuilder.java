@@ -40,9 +40,14 @@ public final class InitialSubscriptionBuilder<T> extends SubscriptionBuilder<T, 
     }
 
     @NotNull
-    public SubscriptionBuilder<T, T> rejectSubtopics() {
-        topicFilter = (topic) -> this.topic == topic;
+    public SubscriptionBuilder<T, T> filterTopic(@NotNull TopicFilter<T> filter) {
+        topicFilter = filter;
         return this;
+    }
+
+    @NotNull
+    public SubscriptionBuilder<T, T> rejectSubtopics() {
+        return filterTopic((topic) -> this.topic == topic);
     }
 
     @NotNull
