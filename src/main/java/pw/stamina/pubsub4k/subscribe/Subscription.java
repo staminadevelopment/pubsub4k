@@ -40,7 +40,7 @@ public final class Subscription<T> {
      */
     @NotNull private final MessageHandler<T> messageHandler;
 
-    public Subscription(
+    Subscription(
             @NotNull Class<T> topic,
             @NotNull MessageSubscriber subscriber,
             @Nullable TopicFilter<T> topicFilter,

@@ -30,21 +30,21 @@ public abstract class SubscriptionBuilder<T, U> {
 
     @NotNull
     public final SubscriptionBuilder<T, U> filterContent(@NotNull ContentFilter<U> filter) {
-        return new DecoratedSubscriptionBuilder<>(this, (handler) -> (message) -> {
+        return new DecoratingSubscriptionBuilder<>(this, (handler) -> (message) -> {
             if (filter.accepts(message)) handler.accept(message);
         });
     }
 
     @NotNull
     public final <R> SubscriptionBuilder<T, R> mapped(@NotNull ContentMapper<U, R> mapper) {
-        return new DecoratedSubscriptionBuilder<>(this, (handler) -> (message) -> {
+        return new DecoratingSubscriptionBuilder<>(this, (handler) -> (message) -> {
             handler.accept(mapper.apply(message));
         });
     }
 
     @NotNull
     public final <R> SubscriptionBuilder<T, R> filterMapped(@NotNull ContentFilterMapper<U, R> filterMapper) {
-        return new DecoratedSubscriptionBuilder<>(this, (handler) -> (message) -> {
+        return new DecoratingSubscriptionBuilder<>(this, (handler) -> (message) -> {
             if (filterMapper.filter(message)) handler.accept(filterMapper.map(message));
         });
     }

@@ -26,12 +26,12 @@ package pw.stamina.pubsub4k.subscribe;
 
 import org.jetbrains.annotations.NotNull;
 
-public class DecoratedSubscriptionBuilder<T, U, R> extends SubscriptionBuilder<T, R> {
+public class DecoratingSubscriptionBuilder<T, U, R> extends SubscriptionBuilder<T, R> {
 
     @NotNull private final SubscriptionBuilder<T, U> parent;
     @NotNull private final HandlerDecorator<U, R> handlerDecorator;
 
-    DecoratedSubscriptionBuilder(
+    DecoratingSubscriptionBuilder(
             @NotNull SubscriptionBuilder<T, U> parent,
             @NotNull HandlerDecorator<U, R> handlerDecorator) {
         this.parent = parent;
