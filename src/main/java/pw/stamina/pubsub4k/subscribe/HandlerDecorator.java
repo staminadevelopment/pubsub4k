@@ -26,9 +26,11 @@ package pw.stamina.pubsub4k.subscribe;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Consumer;
+
 @FunctionalInterface
 public interface HandlerDecorator<T, R> {
 
     @NotNull
-    MessageHandler<T> decorateHandler(@NotNull MessageHandler<R> handler);
+    Consumer<T> decorateHandler(@NotNull Consumer<R> handler);
 }

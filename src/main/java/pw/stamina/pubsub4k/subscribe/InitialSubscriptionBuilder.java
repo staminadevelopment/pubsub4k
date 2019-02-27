@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import pw.stamina.pubsub4k.MessageSubscriber;
 
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public final class InitialSubscriptionBuilder<T> extends SubscriptionBuilder<T, T> {
@@ -54,7 +55,7 @@ public final class InitialSubscriptionBuilder<T> extends SubscriptionBuilder<T, 
 
     @NotNull
     @Override
-    public Subscription<T> build(@NotNull MessageHandler<T> messageHandler) {
+    public Subscription<T> build(@NotNull Consumer<T> messageHandler) {
         return new Subscription<>(topic, subscriber, topicFilter, messageHandler);
     }
 }

@@ -26,6 +26,7 @@ package pw.stamina.pubsub4k.subscribe;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -50,5 +51,5 @@ public abstract class SubscriptionBuilder<T, U> {
     }
 
     @NotNull
-    public abstract Subscription<T> build(MessageHandler<U> messageHandler);
+    public abstract Subscription<T> build(Consumer<U> messageHandler);
 }

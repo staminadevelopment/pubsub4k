@@ -26,6 +26,8 @@ package pw.stamina.pubsub4k.subscribe;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Consumer;
+
 public class DecoratingSubscriptionBuilder<T, U, R> extends SubscriptionBuilder<T, R> {
 
     @NotNull private final SubscriptionBuilder<T, U> parent;
@@ -40,7 +42,7 @@ public class DecoratingSubscriptionBuilder<T, U, R> extends SubscriptionBuilder<
 
     @NotNull
     @Override
-    public Subscription<T> build(@NotNull MessageHandler<R> messageHandler) {
+    public Subscription<T> build(@NotNull Consumer<R> messageHandler) {
         return parent.build(handlerDecorator.decorateHandler(messageHandler));
     }
 }

@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import pw.stamina.pubsub4k.MessageSubscriber;
 
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public final class Subscription<T> {
@@ -40,13 +41,13 @@ public final class Subscription<T> {
      * Handler function for the messages received by this
      * subscription.
      */
-    @NotNull private final MessageHandler<T> messageHandler;
+    @NotNull private final Consumer<T> messageHandler;
 
     Subscription(
             @NotNull Class<T> topic,
             @NotNull MessageSubscriber subscriber,
             @Nullable Predicate<Class<? extends T>> topicFilter,
-            @NotNull MessageHandler<T> messageHandler) {
+            @NotNull Consumer<T> messageHandler) {
         this.topic = topic;
         this.subscriber = subscriber;
         this.topicFilter = topicFilter;
@@ -69,7 +70,7 @@ public final class Subscription<T> {
     }
 
     @NotNull
-    public MessageHandler<T> getMessageHandler() {
+    public Consumer<T> getMessageHandler() {
         return messageHandler;
     }
 
