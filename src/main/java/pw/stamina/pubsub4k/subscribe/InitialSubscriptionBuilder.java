@@ -28,11 +28,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import pw.stamina.pubsub4k.MessageSubscriber;
 
+import java.util.function.Predicate;
+
 public final class InitialSubscriptionBuilder<T> extends SubscriptionBuilder<T, T> {
 
     @NotNull private final Class<T> topic;
     @NotNull private final MessageSubscriber subscriber;
-    @Nullable private TopicFilter<T> topicFilter;
+    @Nullable private Predicate<Class<? extends T>> topicFilter;
 
     InitialSubscriptionBuilder(@NotNull Class<T> topic, @NotNull MessageSubscriber subscriber) {
         this.topic = topic;
@@ -40,7 +42,7 @@ public final class InitialSubscriptionBuilder<T> extends SubscriptionBuilder<T, 
     }
 
     @NotNull
-    public SubscriptionBuilder<T, T> filterTopic(@NotNull TopicFilter<T> filter) {
+    public SubscriptionBuilder<T, T> filterTopic(@NotNull Predicate<Class<? extends T>> filter) {
         topicFilter = filter;
         return this;
     }

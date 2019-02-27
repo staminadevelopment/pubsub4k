@@ -26,27 +26,27 @@ package pw.stamina.pubsub4k.subscribe;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 public abstract class SubscriptionBuilder<T, U> {
 
     @NotNull
-    public final SubscriptionBuilder<T, U> filterContent(@NotNull ContentFilter<U> filter) {
+    public final SubscriptionBuilder<T, U> filterMessage(@NotNull Predicate<U> filter) {
         return new DecoratingSubscriptionBuilder<>(this, (handler) -> (message) -> {
-            if (filter.accepts(message)) handler.accept(message);
+            if (filter.test(message)) handler.accept(message);
         });
     }
 
     @NotNull
-    public final <R> SubscriptionBuilder<T, R> mapped(@NotNull ContentMapper<U, R> mapper) {
-        return new DecoratingSubscriptionBuilder<>(this, (handler) -> (message) -> {
-            handler.accept(mapper.apply(message));
-        });
+    public final <R> SubscriptionBuilder<T, R> mapped(@NotNull Function<U, R> mapper) {
+        return new DecoratingSubscriptionBuilder<>(this,
+                (handler) -> (message) -> handler.accept(mapper.apply(message)));
     }
 
     @NotNull
     public final <R> SubscriptionBuilder<T, R> filterMapped(@NotNull ContentFilterMapper<U, R> filterMapper) {
-        return new DecoratingSubscriptionBuilder<>(this, (handler) -> (message) -> {
-            if (filterMapper.filter(message)) handler.accept(filterMapper.map(message));
-        });
+        return filterMessage(filterMapper::filter).mapped(filterMapper::map);
     }
 
     @NotNull

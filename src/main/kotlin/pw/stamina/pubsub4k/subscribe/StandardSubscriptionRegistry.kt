@@ -51,9 +51,8 @@ class StandardSubscriptionRegistry : SubscriptionRegistry {
         return subscriberToSubscriptionMap.values.asSequence().flatten()
                 .filter { topic.isSubtopicOf(it.topic) }
                 .filterIsInstance<Subscription<T>>()
-                .filter { it.topicFilter?.accepts(topic) != false }
                 .filterTo(mutableSetOf()) {
-                    it.topicFilter?.accepts(topic) != false
+                    it.topicFilter?.test(topic) != false
                 }
     }
 }

@@ -33,7 +33,7 @@ inline fun <reified T> MessageSubscriber.newSubscription(
         noinline messageHandler: (T) -> Unit
 ): Subscription<T> {
     return newSubscription<T>()
-            .let { contentFilter?.let(it::filterContent) ?: it }
+            .let { contentFilter?.let(it::filterMessage) ?: it }
             .build(messageHandler)
 }
 
