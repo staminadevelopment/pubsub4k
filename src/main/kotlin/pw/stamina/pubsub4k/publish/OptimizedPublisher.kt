@@ -26,19 +26,33 @@ package pw.stamina.pubsub4k.publish
 
 import pw.stamina.pubsub4k.subscribe.Subscription
 
-sealed class OptimizedPublisher<T> : Publisher<T> {
+/**
+ * An optimized set of [Publisher] implementations. This
+ * class does not implement the [Publisher] interface to
+ * avoid implementing the topic property.
+ */
+sealed class OptimizedPublisher<T> {
 
+    // From the Publisher interface
+    abstract val subscriptions: Set<Subscription<T>>
+    abstract fun publish(message: T)
+
+    /** Returns an optimized publisher with the specified [subscription] added to it. */
     abstract fun added(subscription: Subscription<T>): OptimizedPublisher<T>
-    
+
+    /** Returns an optimized publisher with the specified [subscription] remove from it. */
     abstract fun removed(subscription: Subscription<T>): OptimizedPublisher<T>
 
     companion object {
+
+        /** Returns a new publisher optimized for the specified [subscriptions]. */
         fun <T> fromSubscriptions(subscriptions: Set<Subscription<T>>) = when (subscriptions.size) {
-            0 -> EmptyPublisher()
+            0 -> empty()
             1 -> SingleSubscriptionPublisher(subscriptions.single())
             else -> ManySubscriptionsPublisher(subscriptions)
         }
 
+        /** Returns a new publisher optimized for no registered subscriptions. */
         fun <T> empty(): OptimizedPublisher<T> {
             return EmptyPublisher()
         }
