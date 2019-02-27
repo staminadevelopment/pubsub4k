@@ -3,11 +3,13 @@
 [![License][license-badge]](/LICENSE)
 [![Maven Central][maven-badge]](https://search.maven.org/artifact/pw.stamina/pubsub4k)
 [![Build Status][travis-badge]](https://travis-ci.org/staminadevelopment/pubsub4k)
+[![Code quality][codebeat-badge]](https://codebeat.co/projects/github-com-staminadevelopment-pubsub4k-master)
 
 [java-badge]: https://img.shields.io/badge/Java-8%2B-informational.svg
 [license-badge]: https://img.shields.io/github/license/staminadevelopment/pubsub4k.svg
 [maven-badge]: https://img.shields.io/maven-central/v/pw.stamina/pubsub4k.svg
 [travis-badge]: https://travis-ci.org/staminadevelopment/pubsub4k.svg?branch=master
+[codebeat-badge]: https://codebeat.co/badges/3ff547d9-7d03-4c6d-aec8-a7d26cd0ac85
 
 A simple yet powerful pubsub system for Java and Kotlin.
 
