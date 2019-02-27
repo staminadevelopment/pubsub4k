@@ -25,6 +25,8 @@
 package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
+import pw.stamina.pubsub4k.publish.StandardPublisherRegistry
+import pw.stamina.pubsub4k.subscribe.StandardSubscriptionRegistry
 import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
 
 interface EventBus {
@@ -36,6 +38,17 @@ interface EventBus {
     fun <T> getPublisher(topic: Topic<T>): Publisher<T>
 
     val subscriptions: SubscriptionRegistry
+
+    companion object {
+
+        @JvmStatic
+        fun createStandardBus(): EventBus {
+            val publishers = StandardPublisherRegistry()
+            val subscriptions = StandardSubscriptionRegistry()
+
+            return StandardEventBus(subscriptions, publishers)
+        }
+    }
 }
 
 /**
