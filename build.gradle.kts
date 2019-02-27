@@ -39,6 +39,8 @@ dependencies {
 
     testImplementation(Dependencies.spekDslJvm)
     testRuntimeOnly (Dependencies.spekRunnerJUnit5)
+    
+    testImplementation(Dependencies.kluent)
 
     testRuntimeOnly(kotlin("reflect"))
 }
