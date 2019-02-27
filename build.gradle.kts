@@ -25,6 +25,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    jacoco
     kotlin("jvm") version Versions.kotlin
 }
 
@@ -38,4 +39,21 @@ dependencies {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+tasks {
+    jacocoTestReport {
+        reports {
+            xml.isEnabled = true
+            html.isEnabled = true
+        }
+    }
+
+    check {
+        dependsOn(jacocoTestReport)
+    }
+}
+
+jacoco {
+    toolVersion = Versions.jacoco
 }
