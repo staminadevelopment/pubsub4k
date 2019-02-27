@@ -52,7 +52,7 @@ interface PublisherRegistry {
     fun <T> findPublishersFor(subscription: Subscription<T>): Set<Publisher<T>>
 
     /**
-     *
+     * Adds the subscription from all publishers
      */
     fun <T> addSubscriptionToPublishers(subscription: Subscription<T>)
 
