@@ -26,4 +26,6 @@ object Versions {
     const val kotlin = "1.3.21"
 
     const val jacoco = "0.8.3"
+
+    const val spek = "2.0.0"
 }

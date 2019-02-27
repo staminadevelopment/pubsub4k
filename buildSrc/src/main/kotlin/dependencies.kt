@@ -23,5 +23,7 @@
  */
 
 object Dependencies {
-    const val javax_inject = "javax.inject:javax.inject:1"
+
+    const val spekDslJvm = "org.spekframework.spek2:spek-dsl-jvm:${Versions.spek}"
+    const val spekRunnerJUnit5 = "org.spekframework.spek2:spek-runner-junit5:${Versions.spek}"
 }

@@ -31,10 +31,16 @@ plugins {
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
+    implementation(kotlin("stdlib-jdk8"))
+
+    testImplementation(Dependencies.spekDslJvm)
+    testRuntimeOnly (Dependencies.spekRunnerJUnit5)
+
+    testRuntimeOnly(kotlin("reflect"))
 }
 
 tasks.withType<KotlinCompile> {
@@ -51,6 +57,12 @@ tasks {
 
     check {
         dependsOn(jacocoTestReport)
+    }
+
+    test {
+        useJUnitPlatform {
+            includeEngines("spek2")
+        }
     }
 }
 
