@@ -34,37 +34,25 @@ class PublisherUpdatingSubscriptionRegistry(
 
     override fun register(subscription: Subscription<*>): Boolean {
         val registered = registry.register(subscription)
-        if (registered) addSubscriptionToPublishers(subscription)
+        if (registered) publishers.removeSubscriptionFromPublishers(subscription)
         return registered
     }
 
     override fun unregister(subscription: Subscription<*>): Boolean {
         val unregistered = registry.unregister(subscription)
-        if (unregistered) removeSubscriptionFromPublishers(subscription)
+        if (unregistered) publishers.removeSubscriptionFromPublishers(subscription)
         return unregistered
     }
 
     override fun registerAll(subscriptions: Set<Subscription<*>>): Set<Subscription<*>> {
         val registeredSubscriptions = registry.registerAll(subscriptions)
-
-        registeredSubscriptions.forEach { addSubscriptionToPublishers(it) }
-
+        registeredSubscriptions.forEach { publishers.removeSubscriptionFromPublishers(it) }
         return registeredSubscriptions
     }
 
     override fun unregisterAll(subscriber: MessageSubscriber): Set<Subscription<*>> {
         val unregisteredSubscriptions = registry.unregisterAll(subscriber)
-
-        unregisteredSubscriptions.forEach { removeSubscriptionFromPublishers(it) }
-
+        unregisteredSubscriptions.forEach { publishers.removeSubscriptionFromPublishers(it) }
         return unregisteredSubscriptions
-    }
-
-    private fun <T> addSubscriptionToPublishers(subscription: Subscription<T>) {
-        publishers.findPublishersFor(subscription).forEach { it.add(subscription) }
-    }
-
-    private fun <T> removeSubscriptionFromPublishers(subscription: Subscription<T>) {
-        publishers.findPublishersFor(subscription).forEach { it.remove(subscription) }
     }
 }
