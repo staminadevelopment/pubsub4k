@@ -28,31 +28,48 @@ import pw.stamina.pubsub4k.Topic
 import pw.stamina.pubsub4k.subscribe.Subscription
 
 /**
- * A delegating implementation of the [Publisher] interface. This
- * class is useful if
+ * The [PublisherContainer] implements the [Publisher]
+ * interface, and provides function to add or remove
+ * subscriptions.
+ *
+ * When subscriptions are added or removed from this class,
+ * the [publisher] property is update with a new publisher,
+ * effectively making this class copy-on-write, meaning it
+ * is safe to publish to it from many threads, but only one
+ * thread may update this class.
  */
 class PublisherContainer<T>(
-        val topic: Topic<T>
+        override val topic: Topic<T>,
+        subscriptions: Set<Subscription<T>>
 ) : Publisher<T> {
 
-    private var delegate = OptimizedPublisher.empty<T>()
+    private var publisher = OptimizedPublisher.fromSubscriptions(subscriptions)
 
     override val subscriptions: Set<Subscription<T>>
-        get() = delegate.subscriptions
+        get() = publisher.subscriptions
 
     override fun publish(message: T) {
-        delegate.publish(message)
+        publisher.publish(message)
     }
 
-    fun updateSubscriptions(subscriptions: Set<Subscription<T>>) {
-        delegate = OptimizedPublisher.fromSubscriptions(subscriptions)
-    }
-
+    /**
+     * Adds the [subscription] to this container.
+     */
     fun add(subscription: Subscription<T>) {
-        delegate = delegate.added(subscription)
+        publisher = publisher.added(subscription)
     }
 
+    /**
+     * Removes the [subscription] from this container.
+     */
     fun remove(subscription: Subscription<T>) {
-        delegate = delegate.removed(subscription)
+        publisher = publisher.removed(subscription)
+    }
+
+    /**
+     * Removes all [subscriptions] from this container.
+     */
+    fun clear() {
+        publisher = OptimizedPublisher.empty()
     }
 }
