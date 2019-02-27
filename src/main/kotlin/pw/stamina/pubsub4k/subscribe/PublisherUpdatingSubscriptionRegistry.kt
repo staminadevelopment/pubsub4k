@@ -34,7 +34,7 @@ class PublisherUpdatingSubscriptionRegistry(
 
     override fun register(subscription: Subscription<*>): Boolean {
         val registered = registry.register(subscription)
-        if (registered) publishers.removeSubscriptionFromPublishers(subscription)
+        if (registered) publishers.addSubscriptionToPublishers(subscription)
         return registered
     }
 
@@ -46,7 +46,7 @@ class PublisherUpdatingSubscriptionRegistry(
 
     override fun registerAll(subscriptions: Set<Subscription<*>>): Set<Subscription<*>> {
         val registeredSubscriptions = registry.registerAll(subscriptions)
-        registeredSubscriptions.forEach { publishers.removeSubscriptionFromPublishers(it) }
+        registeredSubscriptions.forEach { publishers.addSubscriptionToPublishers(it) }
         return registeredSubscriptions
     }
 
