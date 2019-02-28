@@ -22,26 +22,41 @@
  * SOFTWARE.
  */
 
-package pw.stamina.pubsub4k
+package pw.stamina.pubsub4k.publish
 
+import com.nhaarman.mockitokotlin2.mock
+import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldBeInstanceOf
+import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import pw.stamina.pubsub4k.subscribe.PublisherUpdatingSubscriptionRegistry
+import pw.stamina.pubsub4k.subscribe.Subscription
 
-object StandardEventBusSpec : Spek({
-    describe("Standard event bus instance") {
-        val bus by memoized { EventBus.createStandardBus() }
+object EmptyPublisherSpec : Spek({
 
-        describe("bus subscriptions") {
-            it ("should be instance of PublisherUpdatingSubscriptionRegistry") {
-                bus.subscriptions shouldBeInstanceOf(PublisherUpdatingSubscriptionRegistry::class)
+    val subscription = mock<Subscription<Any>>(stubOnly = true, defaultAnswer = RETURNS_DEEP_STUBS)
+
+    describe("empty publisher") {
+        val publisher = EmptyPublisher<Any>()
+
+        it("subscriptions should be empty") {
+            publisher.subscriptions.shouldBeEmpty()
+        }
+
+        describe("removed subscription") {
+            val publisherWithSubscriptionRemoved = publisher.removed(subscription)
+
+            it("should return itself") {
+                publisherWithSubscriptionRemoved shouldBe publisher
             }
         }
 
-        describe("get publisher") {
-            it("should get publisher from specified publishers, with subscriptions from specified subscriptions") {
-                val publisher = bus.getPublisher<String>()
+        describe("added subscription") {
+            val publisherWithSubscriptionAdded = publisher.added(subscription)
+
+            it("should return single subscription publisher") {
+                publisherWithSubscriptionAdded shouldBeInstanceOf SingleSubscriptionPublisher::class
             }
         }
     }

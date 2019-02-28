@@ -35,6 +35,7 @@ sealed class OptimizedPublisher<T> {
 
     // From the Publisher interface
     abstract val subscriptions: Set<Subscription<T>>
+
     abstract fun publish(message: T)
 
     /** Returns an optimized publisher with the specified [subscription] added to it. */
@@ -59,7 +60,7 @@ sealed class OptimizedPublisher<T> {
     }
 }
 
-private class EmptyPublisher<T> : OptimizedPublisher<T>() {
+internal class EmptyPublisher<T> : OptimizedPublisher<T>() {
 
     override val subscriptions = emptySet<Subscription<T>>()
 
@@ -69,7 +70,7 @@ private class EmptyPublisher<T> : OptimizedPublisher<T>() {
     override fun removed(subscription: Subscription<T>) = this
 }
 
-private class SingleSubscriptionPublisher<T>(
+internal class SingleSubscriptionPublisher<T>(
         private val subscription: Subscription<T>
 ) : OptimizedPublisher<T>() {
 
@@ -80,13 +81,13 @@ private class SingleSubscriptionPublisher<T>(
     override fun publish(message: T) = messageHandler.accept(message)
 
     override fun added(subscription: Subscription<T>) =
-            ManySubscriptionsPublisher(subscriptions + subscription)
+            if (subscription == this.subscription) this else ManySubscriptionsPublisher(subscriptions + subscription)
 
     override fun removed(subscription: Subscription<T>) =
             if (subscription == this.subscription) EmptyPublisher<T>() else this
 }
 
-private class ManySubscriptionsPublisher<T>(
+internal class ManySubscriptionsPublisher<T>(
         override val subscriptions: Set<Subscription<T>>
 ) : OptimizedPublisher<T>() {
 
@@ -95,9 +96,12 @@ private class ManySubscriptionsPublisher<T>(
     override fun publish(message: T) = messageHandlers.forEach { handler -> handler.accept(message) }
 
     override fun added(subscription: Subscription<T>) =
-            ManySubscriptionsPublisher(subscriptions + subscription)
+            if (subscriptions.contains(subscription)) this else
+                ManySubscriptionsPublisher(subscriptions + subscription)
 
     override fun removed(subscription: Subscription<T>): OptimizedPublisher<T> {
+        if (!subscriptions.contains(subscription)) return this
+
         val subscriptions = subscriptions - subscription
         return subscriptions.singleOrNull()?.let(::SingleSubscriptionPublisher)
                 ?: ManySubscriptionsPublisher(subscriptions)

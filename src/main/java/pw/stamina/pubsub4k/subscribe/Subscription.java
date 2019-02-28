@@ -31,7 +31,7 @@ import pw.stamina.pubsub4k.MessageSubscriber;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public final class Subscription<T> {
+public class Subscription<T> {
 
     @NotNull private final Class<T> topic;
     @NotNull private final MessageSubscriber subscriber;

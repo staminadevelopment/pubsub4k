@@ -22,27 +22,41 @@
  * SOFTWARE.
  */
 
-package pw.stamina.pubsub4k
+package pw.stamina.pubsub4k.publish
 
+import com.nhaarman.mockitokotlin2.mock
 import org.amshove.kluent.shouldBeInstanceOf
+import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import pw.stamina.pubsub4k.subscribe.PublisherUpdatingSubscriptionRegistry
+import pw.stamina.pubsub4k.publish.OptimizedPublisher.Companion.fromSubscriptions
+import pw.stamina.pubsub4k.subscribe.Subscription
 
-object StandardEventBusSpec : Spek({
-    describe("Standard event bus instance") {
-        val bus by memoized { EventBus.createStandardBus() }
+object OptimizedPublisherSpec : Spek({
 
-        describe("bus subscriptions") {
-            it ("should be instance of PublisherUpdatingSubscriptionRegistry") {
-                bus.subscriptions shouldBeInstanceOf(PublisherUpdatingSubscriptionRegistry::class)
+    val subscription = mock<Subscription<Any>>(stubOnly = true, defaultAnswer = RETURNS_DEEP_STUBS)
+    val subscription2 = mock<Subscription<Any>>(stubOnly = true, defaultAnswer = RETURNS_DEEP_STUBS)
+
+    describe("fromSubscriptions") {
+        describe("given empty set") {
+            it("should return empty publisher") {
+                fromSubscriptions<Any>(emptySet()) shouldBeInstanceOf EmptyPublisher::class
             }
         }
 
-        describe("get publisher") {
-            it("should get publisher from specified publishers, with subscriptions from specified subscriptions") {
-                val publisher = bus.getPublisher<String>()
+        describe("given set with one subscription") {
+            it("should return publisher for a single subscription") {
+                val subscriptions = setOf(subscription)
+                fromSubscriptions(subscriptions) shouldBeInstanceOf SingleSubscriptionPublisher::class
+            }
+        }
+
+        describe("given set with multiple subscriptions") {
+            it("should return publisher for many subscriptions") {
+                val subscriptions = setOf(subscription, subscription2)
+                fromSubscriptions(subscriptions) shouldBeInstanceOf ManySubscriptionsPublisher::class
             }
         }
     }
 })
+
