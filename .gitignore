@@ -1,10 +1,12 @@
 ### Intellij+all ###
 
-.idea/
+.idea/*
 *.iml
 *.iws
 *.ipr
 out/
+
+!.idea/copyright/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
