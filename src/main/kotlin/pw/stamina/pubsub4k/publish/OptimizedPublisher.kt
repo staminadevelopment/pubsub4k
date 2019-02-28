@@ -25,6 +25,7 @@
 package pw.stamina.pubsub4k.publish
 
 import pw.stamina.pubsub4k.subscribe.Subscription
+import java.util.function.Consumer
 
 /**
  * An optimized set of [Publisher] implementations. This
@@ -81,29 +82,47 @@ internal class SingleSubscriptionPublisher<T>(
     override fun publish(message: T) = messageHandler.accept(message)
 
     override fun added(subscription: Subscription<T>) =
-            if (subscription == this.subscription) this else ManySubscriptionsPublisher(subscriptions + subscription)
+            if (subscription == this.subscription) this else
+                ManySubscriptionsPublisher(setOf(this.subscription, subscription))
 
     override fun removed(subscription: Subscription<T>) =
             if (subscription == this.subscription) EmptyPublisher<T>() else this
 }
 
 internal class ManySubscriptionsPublisher<T>(
-        override val subscriptions: Set<Subscription<T>>
+        subscriptions: Set<Subscription<T>>
 ) : OptimizedPublisher<T>() {
 
-    private val messageHandlers = subscriptions.map { it.messageHandler }
+    override val subscriptions = subscriptions.toMutableSet()
+    private val messageHandlers = subscriptions.mapTo(ArrayList()) { it.messageHandler }
 
-    override fun publish(message: T) = messageHandlers.forEach { handler -> handler.accept(message) }
+    override fun publish(message: T) {
+        /*
+         * We pass a Consumer instance to use the Iterable#forEach
+         * method from Java instead of the Kotlin version, because
+         * ArrayList provides an optimized version that internally
+         * iterates its array of elements.
+        */
+        messageHandlers.forEach(Consumer { it.accept(message) })
+    }
 
-    override fun added(subscription: Subscription<T>) =
-            if (subscriptions.contains(subscription)) this else
-                ManySubscriptionsPublisher(subscriptions + subscription)
+    override fun added(subscription: Subscription<T>): OptimizedPublisher<T> {
+        if (subscriptions.add(subscription)) {
+            messageHandlers.add(subscription.messageHandler)
+        }
+
+        return this
+    }
 
     override fun removed(subscription: Subscription<T>): OptimizedPublisher<T> {
-        if (!subscriptions.contains(subscription)) return this
+        if (subscriptions.remove(subscription)) {
+            messageHandlers.remove(subscription.messageHandler)
 
-        val subscriptions = subscriptions - subscription
-        return subscriptions.singleOrNull()?.let(::SingleSubscriptionPublisher)
-                ?: ManySubscriptionsPublisher(subscriptions)
+            if (subscriptions.size == 1) {
+                return SingleSubscriptionPublisher(subscriptions.single())
+            }
+        }
+
+        return this
     }
 }

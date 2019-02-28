@@ -49,7 +49,7 @@ object ManySubscriptionPublisherSpec : Spek({
 
         describe("publisher with 2 subscriptions") {
             val subscriptions = setOf(subscription, subscription2)
-            val publisher = ManySubscriptionsPublisher(subscriptions)
+            val publisher by memoized { ManySubscriptionsPublisher(subscriptions) }
 
             it("subscriptions contain only specified subscriptions") {
                 publisher.subscriptions shouldEqual subscriptions
@@ -75,7 +75,7 @@ object ManySubscriptionPublisherSpec : Spek({
                         result = publisher.removed(subscription)
                     }
 
-                    it("should return single subscription publisher") {
+                    it("should return new single subscription publisher") {
                         result shouldBeInstanceOf SingleSubscriptionPublisher::class
                     }
 
@@ -106,6 +106,10 @@ object ManySubscriptionPublisherSpec : Spek({
                     it("should return itself") {
                         result shouldBe publisher
                     }
+
+                    it("should not add subscription") {
+                        result.subscriptions shouldEqual subscriptions
+                    }
                 }
 
                 describe("other subscription") {
@@ -114,9 +118,8 @@ object ManySubscriptionPublisherSpec : Spek({
                         result = publisher.added(subscription3)
                     }
 
-                    it("should return new many subscriptions publisher") {
-                        result shouldBeInstanceOf ManySubscriptionsPublisher::class
-
+                    it("should return itself") {
+                        result shouldBe publisher
                     }
 
                     it("should contain subscriptions from publisher and other subscription") {
@@ -137,8 +140,8 @@ object ManySubscriptionPublisherSpec : Spek({
                         result = publisher.removed(subscription)
                     }
 
-                    it("should return publisher with 2 subscriptions") {
-                        result shouldBeInstanceOf ManySubscriptionsPublisher::class
+                    it("should return itself") {
+                        result shouldBe publisher
                     }
 
                     it("should only contain subscription2 and subscription3") {
