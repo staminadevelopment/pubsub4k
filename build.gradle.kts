@@ -41,6 +41,7 @@ dependencies {
     testRuntimeOnly (Dependencies.spekRunnerJUnit5)
     
     testImplementation(Dependencies.kluent)
+    testImplementation(Dependencies.mockitoKotlin)
 
     testRuntimeOnly(kotlin("reflect"))
 }

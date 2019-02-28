@@ -29,4 +29,5 @@ object Versions {
 
     const val spek = "2.0.0"
     const val kluent = "1.48"
+    const val mockitoKotlin = "2.1.0"
 }

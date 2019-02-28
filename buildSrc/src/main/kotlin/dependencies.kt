@@ -28,4 +28,5 @@ object Dependencies {
     const val spekRunnerJUnit5 = "org.spekframework.spek2:spek-runner-junit5:${Versions.spek}"
 
     const val kluent = "org.amshove.kluent:kluent:${Versions.kluent}"
+    const val mockitoKotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:${Versions.mockitoKotlin}"
 }
