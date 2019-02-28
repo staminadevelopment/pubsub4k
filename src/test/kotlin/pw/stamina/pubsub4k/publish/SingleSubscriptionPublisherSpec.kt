@@ -24,69 +24,85 @@
 
 package pw.stamina.pubsub4k.publish
 
+import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
-import org.mockito.Mockito
+import org.amshove.kluent.shouldEqual
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import pw.stamina.pubsub4k.subscribe.Subscription
 
 object SingleSubscriptionPublisherSpec : Spek({
 
-    val subscription = mock<Subscription<Any>>(stubOnly = true, defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
-    val dummySubscription = mock<Subscription<Any>>(stubOnly = true)
-
     describe("publisher with single subscription") {
+        val dummySubscription: Subscription<Any> = mock(stubOnly = true)
+        val subscription: Subscription<Any> = mock(stubOnly = true) {
+            on { messageHandler } doReturn mock()
+        }
+
         val publisher = SingleSubscriptionPublisher(subscription)
 
-        it("subscriptions size should be 1") {
-            publisher.subscriptions.size shouldBe 1
+        it("subscriptions should contain only specified subscription") {
+            publisher.subscriptions shouldEqual setOf(subscription)
         }
 
         describe("publishing message") {
-            it("should call message handler of subscription") {
-                val message = Unit
-
+            val message = Unit
+            before {
                 publisher.publish(message)
+            }
 
+            it("should call message handler of subscription") {
                 verify(subscription.messageHandler).accept(message)
             }
         }
 
         describe("removed subscription") {
             describe("own subscription") {
-                val publisherWithSubscriptionRemoved = publisher.removed(subscription)
+                lateinit var result: OptimizedPublisher<Any>
+                before {
+                    result = publisher.removed(subscription)
+                }
 
                 it("should return empty publisher") {
-                    publisherWithSubscriptionRemoved shouldBeInstanceOf EmptyPublisher::class
+                    result shouldBeInstanceOf EmptyPublisher::class
                 }
             }
 
             describe("other subscription") {
-                val publisherWithSubscriptionRemoved = publisher.removed(dummySubscription)
+                lateinit var result: OptimizedPublisher<Any>
+                before {
+                    result = publisher.removed(dummySubscription)
+                }
 
                 it("should return itself") {
-                    publisherWithSubscriptionRemoved shouldBe publisher
+                    result shouldBe publisher
                 }
             }
         }
 
         describe("added subscription") {
             describe("own subscription") {
-                val publisherWithSubscriptionAdded = publisher.added(subscription)
+                lateinit var result: OptimizedPublisher<Any>
+                before {
+                    result = publisher.added(subscription)
+                }
 
                 it("should return itself") {
-                    publisherWithSubscriptionAdded shouldBe publisher
+                    result shouldBe publisher
                 }
             }
 
             describe("other subscription") {
-                val publisherWithSubscriptionAdded = publisher.added(dummySubscription)
+                lateinit var result: OptimizedPublisher<Any>
+                before {
+                    result = publisher.added(dummySubscription)
+                }
 
                 it("should return many subscriptions publisher") {
-                    publisherWithSubscriptionAdded shouldBeInstanceOf ManySubscriptionsPublisher::class
+                    result shouldBeInstanceOf ManySubscriptionsPublisher::class
                 }
             }
         }

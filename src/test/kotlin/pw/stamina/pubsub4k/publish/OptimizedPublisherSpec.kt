@@ -24,9 +24,9 @@
 
 package pw.stamina.pubsub4k.publish
 
+import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import org.amshove.kluent.shouldBeInstanceOf
-import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import pw.stamina.pubsub4k.publish.OptimizedPublisher.Companion.fromSubscriptions
@@ -34,10 +34,14 @@ import pw.stamina.pubsub4k.subscribe.Subscription
 
 object OptimizedPublisherSpec : Spek({
 
-    val subscription = mock<Subscription<Any>>(stubOnly = true, defaultAnswer = RETURNS_DEEP_STUBS)
-    val subscription2 = mock<Subscription<Any>>(stubOnly = true, defaultAnswer = RETURNS_DEEP_STUBS)
-
     describe("fromSubscriptions") {
+        val subscription: Subscription<Any> = mock(stubOnly = true) {
+            on { messageHandler } doReturn mock()
+        }
+        val subscription2: Subscription<Any> = mock(stubOnly = true) {
+            on { messageHandler } doReturn mock()
+        }
+
         describe("given empty set") {
             it("should return empty publisher") {
                 fromSubscriptions<Any>(emptySet()) shouldBeInstanceOf EmptyPublisher::class

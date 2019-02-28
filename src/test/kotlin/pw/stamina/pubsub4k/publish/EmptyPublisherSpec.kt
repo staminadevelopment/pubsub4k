@@ -25,12 +25,12 @@
 package pw.stamina.pubsub4k.publish
 
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldBeInstanceOf
-import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import org.mockito.Mockito.never
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -38,33 +38,43 @@ import pw.stamina.pubsub4k.subscribe.Subscription
 
 object EmptyPublisherSpec : Spek({
 
-    val subscription = mock<Subscription<Any>>(stubOnly = true, defaultAnswer = RETURNS_DEEP_STUBS)
-
     describe("empty publisher") {
+        val subscription: Subscription<Any> = mock(stubOnly = true) {
+            on { messageHandler } doReturn mock()
+        }
+
         val publisher = EmptyPublisher<Any>()
 
         it("subscriptions should be empty") {
             publisher.subscriptions.shouldBeEmpty()
         }
 
-        it("publishing message should do nothing") {
-            publisher.publish(Unit)
-            verify(subscription.messageHandler, never()).accept(any())
+        describe("publishing message") {
+            it("should do nothing") {
+                publisher.publish(Unit)
+                verify(subscription.messageHandler, never()).accept(any())
+            }
         }
 
         describe("removed subscription") {
-            val publisherWithSubscriptionRemoved = publisher.removed(subscription)
+            lateinit var result: OptimizedPublisher<Any>
+            before {
+                result = publisher.removed(subscription)
+            }
 
             it("should return itself") {
-                publisherWithSubscriptionRemoved shouldBe publisher
+                result shouldBe publisher
             }
         }
 
         describe("added subscription") {
-            val publisherWithSubscriptionAdded = publisher.added(subscription)
+            lateinit var result: OptimizedPublisher<Any>
+            before {
+                result = publisher.added(subscription)
+            }
 
             it("should return single subscription publisher") {
-                publisherWithSubscriptionAdded shouldBeInstanceOf SingleSubscriptionPublisher::class
+                result shouldBeInstanceOf SingleSubscriptionPublisher::class
             }
         }
     }
