@@ -19,6 +19,7 @@ A simple yet powerful pubsub system for Java and Kotlin.
 
 - Fluent API for Java and Kotlin
 - Message filtering and mapping
+- Thread safe by default
 
 ## Prerequisites
  * Use JDK 1.8 or later
@@ -48,7 +49,7 @@ implementation("pw.stamina:pubsub4k:VERSION")
 
 1. Get an `EventBus` instance:
 ```kotlin
-val bus = EventBus.createStandardBus()
+val bus = EventBus.createDefaultBus()
 ```
 
 2. Create a `Publisher` for `String`s:

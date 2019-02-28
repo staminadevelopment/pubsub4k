@@ -22,28 +22,36 @@
  * SOFTWARE.
  */
 
-package pw.stamina.pubsub4k
+package pw.stamina.pubsub4k.subscribe
 
-import org.amshove.kluent.shouldBeInstanceOf
-import org.spekframework.spek2.Spek
-import org.spekframework.spek2.style.specification.describe
-import pw.stamina.pubsub4k.subscribe.PublisherUpdatingSubscriptionRegistry
+import pw.stamina.pubsub4k.MessageSubscriber
+import pw.stamina.pubsub4k.Topic
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 
-object StandardEventBusSpec : Spek({
-    describe("Standard event bus instance") {
-        //TODO: Replace factory function with direct instantiation with mocks
-        val bus by memoized { EventBus.createDefaultBus(locking = false) }
+class LockingSubscriptionRegistry(
+        private val lock: ReentrantReadWriteLock,
+        private val registry: SubscriptionRegistry
+) : SubscriptionRegistry {
 
-        describe("bus subscriptions") {
-            it ("should be instance of PublisherUpdatingSubscriptionRegistry") {
-                bus.subscriptions shouldBeInstanceOf(PublisherUpdatingSubscriptionRegistry::class)
-            }
-        }
-
-        describe("get publisher") {
-            it("should get publisher from specified publishers, with subscriptions from specified subscriptions") {
-                val publisher = bus.getPublisher<String>()
-            }
-        }
+    override fun register(subscription: Subscription<*>) = lock.write {
+        registry.register(subscription)
     }
-})
+
+    override fun unregister(subscription: Subscription<*>) = lock.write {
+        registry.unregister(subscription)
+    }
+
+    override fun registerAll(subscriptions: Set<Subscription<*>>) = lock.write {
+        registry.registerAll(subscriptions)
+    }
+
+    override fun unregisterAll(subscriber: MessageSubscriber) = lock.write {
+        registry.unregisterAll(subscriber)
+    }
+
+    override fun <T> findSubscriptionsForTopic(topic: Topic<T>) = lock.read {
+        registry.findSubscriptionsForTopic(topic)
+    }
+}

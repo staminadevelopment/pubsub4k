@@ -42,11 +42,13 @@ interface EventBus {
     companion object {
 
         @JvmStatic
-        fun createStandardBus(): EventBus {
-            val publishers = StandardPublisherRegistry()
+        fun createDefaultBus(locking: Boolean = true): EventBus {
             val subscriptions = StandardSubscriptionRegistry()
+            val publishers = StandardPublisherRegistry()
 
-            return StandardEventBus(subscriptions, publishers)
+            val bus = StandardEventBus(subscriptions, publishers)
+
+            return if (locking) LockingEventBus(bus) else bus
         }
     }
 }

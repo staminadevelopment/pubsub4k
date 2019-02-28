@@ -24,26 +24,20 @@
 
 package pw.stamina.pubsub4k
 
-import org.amshove.kluent.shouldBeInstanceOf
-import org.spekframework.spek2.Spek
-import org.spekframework.spek2.style.specification.describe
-import pw.stamina.pubsub4k.subscribe.PublisherUpdatingSubscriptionRegistry
+import pw.stamina.pubsub4k.publish.Publisher
+import pw.stamina.pubsub4k.subscribe.LockingSubscriptionRegistry
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.write
 
-object StandardEventBusSpec : Spek({
-    describe("Standard event bus instance") {
-        //TODO: Replace factory function with direct instantiation with mocks
-        val bus by memoized { EventBus.createDefaultBus(locking = false) }
+class LockingEventBus(
+        private val bus: EventBus
+) : EventBus {
 
-        describe("bus subscriptions") {
-            it ("should be instance of PublisherUpdatingSubscriptionRegistry") {
-                bus.subscriptions shouldBeInstanceOf(PublisherUpdatingSubscriptionRegistry::class)
-            }
-        }
+    private val lock = ReentrantReadWriteLock()
 
-        describe("get publisher") {
-            it("should get publisher from specified publishers, with subscriptions from specified subscriptions") {
-                val publisher = bus.getPublisher<String>()
-            }
-        }
+    override fun <T> getPublisher(topic: Topic<T>): Publisher<T> = lock.write {
+        bus.getPublisher(topic)
     }
-})
+
+    override val subscriptions = LockingSubscriptionRegistry(lock, bus.subscriptions)
+}

@@ -30,8 +30,16 @@ import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
 object EventBusSpec : Spek({
-    describe("A standard event bus instance") {
-        val bus by memoized { EventBus.createStandardBus() }
+    describe("A locking default event bus instance") {
+        val bus by memoized { EventBus.createDefaultBus() }
+
+        it("should be instance of LockingEventBus") {
+            bus shouldBeInstanceOf LockingEventBus::class
+        }
+    }
+
+    describe("A non-locking default event bus instance") {
+        val bus by memoized { EventBus.createDefaultBus(locking = false) }
 
         it("should be instance of StandardEventBus") {
             bus shouldBeInstanceOf StandardEventBus::class
