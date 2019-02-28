@@ -48,19 +48,24 @@ object EventBusSpec : Spek({
 })
 
 object TopicSpec : Spek({
-    describe("Topic.isSubtopicOf") {
+    describe("A topic") {
         val topic: Topic<CharSequence> = CharSequence::class.java
 
-        it("should return true for same topic") {
-            topic.isSubtopicOf(topic) shouldBe true
-        }
+        val supertopic: Topic<Any> = Any::class.java
+        val subtopic: Topic<String> = String::class.java
 
-        it("should return true for supertopic") {
-            topic.isSubtopicOf(Any::class.java) shouldBe true
-        }
+        describe("isSubtopicOf") {
+            it("should return true for same topic") {
+                topic.isSubtopicOf(topic) shouldBe true
+            }
 
-        it("should return false for subtopic") {
-            topic.isSubtopicOf(String::class.java) shouldBe false
+            it("should return true for supertopic") {
+                topic.isSubtopicOf(supertopic) shouldBe true
+            }
+
+            it("should return false for subtopic") {
+                topic.isSubtopicOf(subtopic) shouldBe false
+            }
         }
     }
 })
