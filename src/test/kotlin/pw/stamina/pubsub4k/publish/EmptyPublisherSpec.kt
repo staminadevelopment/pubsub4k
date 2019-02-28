@@ -24,11 +24,14 @@
 
 package pw.stamina.pubsub4k.publish
 
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldBeInstanceOf
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
+import org.mockito.Mockito.never
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import pw.stamina.pubsub4k.subscribe.Subscription
@@ -42,6 +45,11 @@ object EmptyPublisherSpec : Spek({
 
         it("subscriptions should be empty") {
             publisher.subscriptions.shouldBeEmpty()
+        }
+
+        it("publishing message should do nothing") {
+            publisher.publish(Unit)
+            verify(subscription.messageHandler, never()).accept(any())
         }
 
         describe("removed subscription") {

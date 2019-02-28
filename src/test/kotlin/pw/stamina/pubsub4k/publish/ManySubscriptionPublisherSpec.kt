@@ -41,8 +41,7 @@ object ManySubscriptionPublisherSpec : Spek({
     val subscription2 = mock<Subscription<Any>>(stubOnly = true, defaultAnswer = RETURNS_DEEP_STUBS)
     val subscription3 = mock<Subscription<Any>>(stubOnly = true, defaultAnswer = RETURNS_DEEP_STUBS)
 
-
-    describe("publisher with many subscriptions") {
+    describe("publisher with 2 subscriptions") {
         val subscriptions = setOf(subscription, subscription2)
         val publisher = ManySubscriptionsPublisher(subscriptions)
 
@@ -60,46 +59,65 @@ object ManySubscriptionPublisherSpec : Spek({
                     verify(subscription.messageHandler).accept(message)
                 }
             }
+        }
 
-            describe("removed subscription") {
-                describe("contained subscription") {
-                    val publisherWithSubscriptionRemoved = publisher.removed(subscription)
+        describe("removed subscription") {
+            describe("contained subscription") {
+                val publisherWithSubscriptionRemoved = publisher.removed(subscription)
 
-                    it("should return single subscription publisher") {
-                        publisherWithSubscriptionRemoved shouldBeInstanceOf SingleSubscriptionPublisher::class
-                    }
-
-                    it("should only contain subscription2") {
-                        publisherWithSubscriptionRemoved.subscriptions shouldEqual setOf(subscription2)
-                    }
+                it("should return single subscription publisher") {
+                    publisherWithSubscriptionRemoved shouldBeInstanceOf SingleSubscriptionPublisher::class
                 }
 
-                describe("other subscription") {
-                    val publisherWithSubscriptionRemoved = publisher.removed(subscription3)
-
-                    it("should return itself") {
-                        publisherWithSubscriptionRemoved shouldBe publisher
-                    }
+                it("should only contain subscription2") {
+                    publisherWithSubscriptionRemoved.subscriptions shouldEqual setOf(subscription2)
                 }
             }
 
-            describe("added subscription") {
-                describe("own subscription") {
-                    val publisherWithSubscriptionAdded = publisher.added(subscription)
+            describe("other subscription") {
+                val publisherWithSubscriptionRemoved = publisher.removed(subscription3)
 
-                    it("should return itself") {
-                        publisherWithSubscriptionAdded shouldBe publisher
-                    }
+                it("should return itself") {
+                    publisherWithSubscriptionRemoved shouldBe publisher
+                }
+            }
+        }
+
+        describe("added subscription") {
+            describe("contained subscription") {
+                val publisherWithSubscriptionAdded = publisher.added(subscription)
+
+                it("should return itself") {
+                    publisherWithSubscriptionAdded shouldBe publisher
+                }
+            }
+
+            describe("other subscription") {
+                val publisherWithSubscriptionAdded = publisher.added(subscription3)
+
+                it("should return new many subscriptions publisher") {
+                    publisherWithSubscriptionAdded shouldBeInstanceOf ManySubscriptionsPublisher::class
+
+                    publisherWithSubscriptionAdded.subscriptions shouldEqual setOf(subscription, subscription2, subscription3)
+                }
+            }
+        }
+    }
+
+    describe("publisher with 3 subscriptions") {
+        val subscriptions = setOf(subscription, subscription2, subscription3)
+        val publisher = ManySubscriptionsPublisher(subscriptions)
+
+        describe("removed subscription") {
+            describe("contained subscription") {
+                val publisherWithSubscriptionRemoved = publisher.removed(subscription)
+
+                it("should return publisher with 2 subscriptions") {
+                    publisherWithSubscriptionRemoved shouldBeInstanceOf ManySubscriptionsPublisher::class
                 }
 
-                describe("other subscription") {
-                    val publisherWithSubscriptionAdded = publisher.added(subscription3)
-
-                    it("should return new many subscriptions publisher") {
-                        publisherWithSubscriptionAdded shouldBeInstanceOf ManySubscriptionsPublisher::class
-
-                        publisherWithSubscriptionAdded.subscriptions shouldEqual setOf(subscription, subscription2, subscription3)
-                    }
+                it("should only contain subscription2 and subscription3") {
+                    publisherWithSubscriptionRemoved.subscriptions shouldEqual setOf(subscription2, subscription3)
                 }
             }
         }
