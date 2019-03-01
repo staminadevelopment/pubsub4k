@@ -24,57 +24,44 @@
 
 package pw.stamina.pubsub4k.publish
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldBeInstanceOf
-import org.mockito.Mockito.never
+import org.amshove.kluent.shouldEqual
+import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import pw.stamina.pubsub4k.subscribe.Subscription
 
 object EmptyPublisherSpec : Spek({
 
-    describe("empty publisher") {
-        val subscription: Subscription<Any> = mock(stubOnly = true) {
-            on { messageHandler } doReturn mock()
-        }
-
-        val publisher = EmptyPublisher<Any>()
+    describe("An empty publisher") {
+        val publisher by memoized { EmptyPublisher<Any>() }
 
         it("subscriptions should be empty") {
             publisher.subscriptions.shouldBeEmpty()
         }
 
-        describe("publishing message") {
-            it("should do nothing") {
-                publisher.publish(Unit)
-                verify(subscription.messageHandler, never()).accept(any())
-            }
-        }
-
-        describe("removed subscription") {
-            lateinit var result: OptimizedPublisher<Any>
-            before {
-                result = publisher.removed(subscription)
-            }
+        describe("removing subscription") {
+            val result by memoized { publisher.removed(mock()) }
 
             it("should return itself") {
                 result shouldBe publisher
             }
         }
 
-        describe("added subscription") {
-            lateinit var result: OptimizedPublisher<Any>
-            before {
-                result = publisher.added(subscription)
-            }
+        describe("adding subscription") {
+            val subscription by memoized { mock<Subscription<Any>>(defaultAnswer = RETURNS_DEEP_STUBS) }
+
+            val result by memoized { publisher.added(subscription) }
 
             it("should return single subscription publisher") {
                 result shouldBeInstanceOf SingleSubscriptionPublisher::class
+            }
+
+            it("returned publisher should contain specified subscription") {
+                result.subscriptions shouldEqual setOf(subscription)
             }
         }
     }

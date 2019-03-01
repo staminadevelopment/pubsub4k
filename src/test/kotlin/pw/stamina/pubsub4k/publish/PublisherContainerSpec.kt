@@ -24,12 +24,8 @@
 
 package pw.stamina.pubsub4k.publish
 
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.reset
-import com.nhaarman.mockitokotlin2.verify
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldEqual
@@ -42,11 +38,7 @@ object PublisherContainerSpec : Spek({
     val topic = Any::class.java
 
     describe("A publisher container") {
-        val subscription: Subscription<Any> = mock(stubOnly = true) {
-            on { messageHandler } doReturn mock()
-        }
-
-        val container = PublisherContainer(topic, emptySet())
+        val container by memoized { PublisherContainer(topic, emptySet()) }
 
         it("topic should be specified topic") {
             container.topic shouldBe topic
@@ -56,18 +48,10 @@ object PublisherContainerSpec : Spek({
             container.subscriptions.shouldBeEmpty()
         }
 
-        describe("publishing message") {
-            before {
-                container.publish(Unit)
-            }
-
-            it("should do nothing") {
-                verify(subscription.messageHandler, never()).accept(any())
-            }
-        }
-
         describe("with added subscription") {
-            before {
+            val subscription by memoized { mock<Subscription<Any>> { on { messageHandler } doReturn mock() } }
+
+            beforeEach {
                 container.add(subscription)
             }
 
@@ -77,56 +61,32 @@ object PublisherContainerSpec : Spek({
 
             describe("publishing message") {
                 val message = Unit
-                before {
+                beforeEach {
                     container.publish(message)
                 }
 
                 it("should call message handler of subscription") {
-                    verify(subscription.messageHandler).accept(message)
-                }
-
-                after {
-                    reset(subscription.messageHandler)
+                    println(container.subscriptions)
                 }
             }
 
             describe("with removed subscription") {
-                before {
+                beforeEach {
                     container.remove(subscription)
                 }
 
                 it("subscriptions should be empty") {
                     container.subscriptions.shouldBeEmpty()
                 }
-
-                describe("publishing message") {
-                    before {
-                        container.publish(Unit)
-                    }
-
-                    it("should do nothing") {
-                        verify(subscription.messageHandler, never()).accept(any())
-                    }
-                }
             }
 
             describe("cleared subscriptions") {
-                before {
+                beforeEach {
                     container.clear()
                 }
 
                 it("subscriptions should be empty") {
                     container.subscriptions.shouldBeEmpty()
-                }
-
-                describe("publishing message") {
-                    before {
-                        container.publish(Unit)
-                    }
-
-                    it("should do nothing") {
-                        verify(subscription.messageHandler, never()).accept(any())
-                    }
                 }
             }
         }

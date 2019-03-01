@@ -36,19 +36,19 @@ import pw.stamina.pubsub4k.subscribe.Subscription
 
 object ManySubscriptionPublisherSpec : Spek({
 
-    describe("publisher with many subscriptions") {
-        val subscription: Subscription<Any> = mock(stubOnly = true) {
-            on { messageHandler } doReturn mock()
+    describe("Publisher with many subscriptions") {
+        val subscription by memoized {
+            mock<Subscription<Any>> { on { messageHandler } doReturn mock() }
         }
-        val subscription2: Subscription<Any> = mock(stubOnly = true) {
-            on { messageHandler } doReturn mock()
+        val subscription2 by memoized {
+            mock<Subscription<Any>> { on { messageHandler } doReturn mock() }
         }
-        val subscription3: Subscription<Any> = mock(stubOnly = true) {
-            on { messageHandler } doReturn mock(stubOnly = true)
+        val subscription3 by memoized {
+            mock<Subscription<Any>> { on { messageHandler } doReturn mock() }
         }
 
         describe("publisher with 2 subscriptions") {
-            val subscriptions = setOf(subscription, subscription2)
+            val subscriptions by memoized { setOf(subscription, subscription2) }
             val publisher by memoized { ManySubscriptionsPublisher(subscriptions) }
 
             it("subscriptions contain only specified subscriptions") {
@@ -57,7 +57,7 @@ object ManySubscriptionPublisherSpec : Spek({
 
             describe("publishing message") {
                 val message = Unit
-                before {
+                beforeEach {
                     publisher.publish(message)
                 }
 
@@ -70,10 +70,7 @@ object ManySubscriptionPublisherSpec : Spek({
 
             describe("removed subscription") {
                 describe("contained subscription") {
-                    lateinit var result: OptimizedPublisher<Any>
-                    before {
-                        result = publisher.removed(subscription)
-                    }
+                    val result by memoized { publisher.removed(subscription) }
 
                     it("should return new single subscription publisher") {
                         result shouldBeInstanceOf SingleSubscriptionPublisher::class
@@ -85,10 +82,7 @@ object ManySubscriptionPublisherSpec : Spek({
                 }
 
                 describe("other subscription") {
-                    lateinit var result: OptimizedPublisher<Any>
-                    before {
-                        result = publisher.removed(subscription3)
-                    }
+                    val result by memoized { publisher.removed(subscription3) }
 
                     it("should return itself") {
                         result shouldBe publisher
@@ -98,10 +92,7 @@ object ManySubscriptionPublisherSpec : Spek({
 
             describe("added subscription") {
                 describe("contained subscription") {
-                    lateinit var result: OptimizedPublisher<Any>
-                    before {
-                        result = publisher.added(subscription)
-                    }
+                    val result by memoized { publisher.added(subscription) }
 
                     it("should return itself") {
                         result shouldBe publisher
@@ -113,10 +104,7 @@ object ManySubscriptionPublisherSpec : Spek({
                 }
 
                 describe("other subscription") {
-                    lateinit var result: OptimizedPublisher<Any>
-                    before {
-                        result = publisher.added(subscription3)
-                    }
+                    val result by memoized { publisher.added(subscription3) }
 
                     it("should return itself") {
                         result shouldBe publisher
@@ -130,15 +118,12 @@ object ManySubscriptionPublisherSpec : Spek({
         }
 
         describe("publisher with 3 subscriptions") {
-            val subscriptions = setOf(subscription, subscription2, subscription3)
-            val publisher = ManySubscriptionsPublisher(subscriptions)
+            val subscriptions by memoized { setOf(subscription, subscription2, subscription3) }
+            val publisher by memoized { ManySubscriptionsPublisher(subscriptions) }
 
-            describe("removed subscription") {
+            describe("removing subscription") {
                 describe("contained subscription") {
-                    lateinit var result: OptimizedPublisher<Any>
-                    before {
-                        result = publisher.removed(subscription)
-                    }
+                    val result by memoized { publisher.removed(subscription) }
 
                     it("should return itself") {
                         result shouldBe publisher

@@ -36,13 +36,12 @@ import pw.stamina.pubsub4k.subscribe.Subscription
 
 object SingleSubscriptionPublisherSpec : Spek({
 
-    describe("publisher with single subscription") {
-        val dummySubscription: Subscription<Any> = mock(stubOnly = true)
-        val subscription: Subscription<Any> = mock(stubOnly = true) {
-            on { messageHandler } doReturn mock()
+    describe("A publisher with a single subscription") {
+        val subscription by memoized {
+            mock<Subscription<Any>> { on { messageHandler } doReturn mock() }
         }
 
-        val publisher = SingleSubscriptionPublisher(subscription)
+        val publisher by memoized { SingleSubscriptionPublisher(subscription) }
 
         it("subscriptions should contain only specified subscription") {
             publisher.subscriptions shouldEqual setOf(subscription)
@@ -50,7 +49,8 @@ object SingleSubscriptionPublisherSpec : Spek({
 
         describe("publishing message") {
             val message = Unit
-            before {
+
+            beforeEach {
                 publisher.publish(message)
             }
 
@@ -59,12 +59,9 @@ object SingleSubscriptionPublisherSpec : Spek({
             }
         }
 
-        describe("removed subscription") {
+        describe("removing subscription") {
             describe("own subscription") {
-                lateinit var result: OptimizedPublisher<Any>
-                before {
-                    result = publisher.removed(subscription)
-                }
+                val result by memoized { publisher.removed(subscription) }
 
                 it("should return empty publisher") {
                     result shouldBeInstanceOf EmptyPublisher::class
@@ -72,10 +69,8 @@ object SingleSubscriptionPublisherSpec : Spek({
             }
 
             describe("other subscription") {
-                lateinit var result: OptimizedPublisher<Any>
-                before {
-                    result = publisher.removed(dummySubscription)
-                }
+                val dummySubscription: Subscription<Any> = mock()
+                val result by memoized { publisher.removed(dummySubscription) }
 
                 it("should return itself") {
                     result shouldBe publisher
@@ -83,12 +78,9 @@ object SingleSubscriptionPublisherSpec : Spek({
             }
         }
 
-        describe("added subscription") {
+        describe("adding subscription") {
             describe("own subscription") {
-                lateinit var result: OptimizedPublisher<Any>
-                before {
-                    result = publisher.added(subscription)
-                }
+                val result by memoized { publisher.added(subscription) }
 
                 it("should return itself") {
                     result shouldBe publisher
@@ -96,10 +88,8 @@ object SingleSubscriptionPublisherSpec : Spek({
             }
 
             describe("other subscription") {
-                lateinit var result: OptimizedPublisher<Any>
-                before {
-                    result = publisher.added(dummySubscription)
-                }
+                val dummySubscription: Subscription<Any> = mock()
+                val result by memoized { publisher.added(dummySubscription) }
 
                 it("should return many subscriptions publisher") {
                     result shouldBeInstanceOf ManySubscriptionsPublisher::class

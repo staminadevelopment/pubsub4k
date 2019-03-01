@@ -35,31 +35,39 @@ import pw.stamina.pubsub4k.subscribe.Subscription
 object OptimizedPublisherSpec : Spek({
 
     describe("fromSubscriptions") {
-        val subscription: Subscription<Any> = mock(stubOnly = true) {
-            on { messageHandler } doReturn mock()
-        }
-        val subscription2: Subscription<Any> = mock(stubOnly = true) {
-            on { messageHandler } doReturn mock()
-        }
-
         describe("given empty set") {
+            val result by memoized { fromSubscriptions<Any>(emptySet()) }
+
             it("should return empty publisher") {
-                fromSubscriptions<Any>(emptySet()) shouldBeInstanceOf EmptyPublisher::class
+                result shouldBeInstanceOf EmptyPublisher::class
             }
         }
 
         describe("given set with one subscription") {
+            val subscription: Subscription<Any> = mock { on { messageHandler } doReturn mock() }
+
+            val result by memoized { fromSubscriptions(setOf(subscription)) }
+
             it("should return publisher for a single subscription") {
-                val subscriptions = setOf(subscription)
-                fromSubscriptions(subscriptions) shouldBeInstanceOf SingleSubscriptionPublisher::class
+                result shouldBeInstanceOf SingleSubscriptionPublisher::class
             }
         }
 
         describe("given set with multiple subscriptions") {
+            val subscriptions = setOf<Subscription<Any>>(mock(), mock())
+            val result by memoized { fromSubscriptions(subscriptions) }
+
             it("should return publisher for many subscriptions") {
-                val subscriptions = setOf(subscription, subscription2)
-                fromSubscriptions(subscriptions) shouldBeInstanceOf ManySubscriptionsPublisher::class
+                result shouldBeInstanceOf ManySubscriptionsPublisher::class
             }
+        }
+    }
+
+    describe("empty") {
+        val result by memoized { OptimizedPublisher.empty<Any>() }
+
+        it("should return empty publisher") {
+            result shouldBeInstanceOf EmptyPublisher::class
         }
     }
 })
