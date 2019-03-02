@@ -26,6 +26,7 @@ package pw.stamina.pubsub4k.publish
 
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldEqual
@@ -66,7 +67,7 @@ object PublisherContainerSpec : Spek({
                 }
 
                 it("should call message handler of subscription") {
-                    println(container.subscriptions)
+                    verify(subscription.messageHandler).accept(message)
                 }
             }
 

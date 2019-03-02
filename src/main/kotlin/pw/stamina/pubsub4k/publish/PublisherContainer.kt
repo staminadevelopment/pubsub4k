@@ -31,6 +31,12 @@ import pw.stamina.pubsub4k.subscribe.Subscription
  * The [PublisherContainer] implements the [Publisher]
  * interface, and provides function to add or remove
  * subscriptions.
+ *
+ * When subscriptions are added or removed from this class,
+ * the [publisher] property is update with a new publisher,
+ * effectively making this class copy-on-write, meaning it
+ * is safe to publish to it from many threads, but only one
+ * thread may update this class.
  */
 class PublisherContainer<T>(
         override val topic: Topic<T>,

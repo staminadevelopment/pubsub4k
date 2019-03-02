@@ -90,10 +90,9 @@ internal class SingleSubscriptionPublisher<T>(
 }
 
 internal class ManySubscriptionsPublisher<T>(
-        subscriptions: Set<Subscription<T>>
+        override val subscriptions: Set<Subscription<T>>
 ) : OptimizedPublisher<T>() {
 
-    override val subscriptions = subscriptions.toMutableSet()
     private val messageHandlers = subscriptions.mapTo(ArrayList()) { it.messageHandler }
 
     override fun publish(message: T) {
@@ -107,22 +106,16 @@ internal class ManySubscriptionsPublisher<T>(
     }
 
     override fun added(subscription: Subscription<T>): OptimizedPublisher<T> {
-        if (subscriptions.add(subscription)) {
-            messageHandlers.add(subscription.messageHandler)
-        }
+        if (subscriptions.contains(subscription)) return this
 
-        return this
+        return ManySubscriptionsPublisher(subscriptions + subscription)
     }
 
     override fun removed(subscription: Subscription<T>): OptimizedPublisher<T> {
-        if (subscriptions.remove(subscription)) {
-            messageHandlers.remove(subscription.messageHandler)
+        if (!subscriptions.contains(subscription)) return this
 
-            if (subscriptions.size == 1) {
-                return SingleSubscriptionPublisher(subscriptions.single())
-            }
-        }
-
-        return this
+        val subscriptions = subscriptions - subscription
+        return subscriptions.singleOrNull()?.let(::SingleSubscriptionPublisher)
+                ?: ManySubscriptionsPublisher(subscriptions)
     }
 }

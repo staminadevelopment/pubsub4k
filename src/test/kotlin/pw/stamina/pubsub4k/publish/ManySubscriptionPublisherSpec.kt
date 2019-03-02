@@ -30,6 +30,7 @@ import com.nhaarman.mockitokotlin2.verify
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldNotBe
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import pw.stamina.pubsub4k.subscribe.Subscription
@@ -106,8 +107,8 @@ object ManySubscriptionPublisherSpec : Spek({
                 describe("other subscription") {
                     val result by memoized { publisher.added(subscription3) }
 
-                    it("should return itself") {
-                        result shouldBe publisher
+                    it("should return new publisher") {
+                        result shouldNotBe publisher
                     }
 
                     it("should contain subscriptions from publisher and other subscription") {
@@ -125,8 +126,8 @@ object ManySubscriptionPublisherSpec : Spek({
                 describe("contained subscription") {
                     val result by memoized { publisher.removed(subscription) }
 
-                    it("should return itself") {
-                        result shouldBe publisher
+                    it("should return new publisher") {
+                        result shouldNotBe publisher
                     }
 
                     it("should only contain subscription2 and subscription3") {
