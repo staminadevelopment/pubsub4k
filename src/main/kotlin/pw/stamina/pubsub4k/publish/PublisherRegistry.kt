@@ -62,5 +62,5 @@ interface PublisherRegistry {
      * Removes the publisher associated with the specified
      * [topic], and clears all its subscriptions.
      */
-    fun <T> removePublisher(topic: Topic<T>)
+    fun <T> removePublisher(topic: Topic<T>): Boolean
 }

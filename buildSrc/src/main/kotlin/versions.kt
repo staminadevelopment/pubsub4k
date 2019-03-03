@@ -27,7 +27,7 @@ object Versions {
 
     const val jacoco = "0.8.3"
 
-    const val spek = "2.0.0"
+    const val spek = "2.0.1"
     const val kluent = "1.48"
     const val mockitoKotlin = "2.1.0"
 }

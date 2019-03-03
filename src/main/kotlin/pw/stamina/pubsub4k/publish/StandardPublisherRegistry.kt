@@ -45,8 +45,11 @@ class StandardPublisherRegistry : PublisherRegistry {
         return publisherLookupMap.getOrPut(topic, containerCreator) as Publisher<T>
     }
 
-    override fun <T> findPublishersFor(subscription: Subscription<T>) =
-            mutableSetOf<Publisher<T>>().apply { forEachPublisherContainerFor(subscription) { this.add(it) } }
+    override fun <T> findPublishersFor(subscription: Subscription<T>): Set<Publisher<T>> {
+        val publishers = mutableSetOf<Publisher<T>>()
+        forEachPublisherContainerFor(subscription) { publishers.add(it) }
+        return publishers
+    }
 
     override fun <T> addSubscriptionToPublishers(subscription: Subscription<T>) =
             forEachPublisherContainerFor(subscription) { it.add(subscription) }
@@ -67,7 +70,6 @@ class StandardPublisherRegistry : PublisherRegistry {
         }
     }
 
-    override fun <T> removePublisher(topic: Topic<T>) {
-        publisherLookupMap.remove(topic)?.clear()
-    }
+    override fun <T> removePublisher(topic: Topic<T>) =
+            publisherLookupMap.remove(topic)?.apply { clear() } != null
 }
