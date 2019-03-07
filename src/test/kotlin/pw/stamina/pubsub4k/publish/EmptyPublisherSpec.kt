@@ -43,6 +43,14 @@ object EmptyPublisherSpec : Spek({
             publisher.subscriptions.shouldBeEmpty()
         }
 
+        describe("publishing message") {
+            val result by memoized { publisher.publish(Unit) }
+
+            it("should do nothing and return unit") {
+                result shouldBe Unit
+            }
+        }
+
         describe("removing subscription") {
             val result by memoized { publisher.removed(mock()) }
 

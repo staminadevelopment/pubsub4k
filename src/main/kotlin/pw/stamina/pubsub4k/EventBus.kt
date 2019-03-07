@@ -28,16 +28,17 @@ import pw.stamina.pubsub4k.publish.Publisher
 import pw.stamina.pubsub4k.publish.StandardPublisherRegistry
 import pw.stamina.pubsub4k.subscribe.StandardSubscriptionRegistry
 import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 interface EventBus {
+
+    val subscriptions: SubscriptionRegistry
 
     /**
      * Returns the publisher associated with the [topic], if
      * a publisher does not exist a new one is created.
      */
     fun <T> getPublisher(topic: Topic<T>): Publisher<T>
-
-    val subscriptions: SubscriptionRegistry
 
     companion object {
 
@@ -48,7 +49,10 @@ interface EventBus {
 
             val bus = StandardEventBus(subscriptions, publishers)
 
-            return if (locking) LockingEventBus(bus) else bus
+            return if (locking) {
+                val lock = ReentrantReadWriteLock()
+                LockingEventBus(bus, lock)
+            } else bus
         }
     }
 }

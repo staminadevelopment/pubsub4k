@@ -24,6 +24,8 @@
 
 package pw.stamina.pubsub4k
 
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
 import org.spekframework.spek2.Spek
@@ -43,6 +45,20 @@ object EventBusSpec : Spek({
 
         it("should be instance of StandardEventBus") {
             bus shouldBeInstanceOf StandardEventBus::class
+        }
+    }
+
+    describe("An event bus") {
+        val bus by memoized { mock<EventBus>() }
+
+        describe("getting publisher by topic with reified function") {
+            beforeEach {
+                bus.getPublisher<Any>()
+            }
+
+            it("should call normal getPublisher function") {
+                verify(bus).getPublisher(Any::class.java)
+            }
         }
     }
 })
