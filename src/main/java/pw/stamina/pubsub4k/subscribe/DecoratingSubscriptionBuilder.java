@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
-public class DecoratingSubscriptionBuilder<T, U, R> extends SubscriptionBuilder<T, R> {
+public final class DecoratingSubscriptionBuilder<T, U, R> extends SubscriptionBuilder<T, R> {
 
     @NotNull private final SubscriptionBuilder<T, U> parent;
     @NotNull private final HandlerDecorator<U, R> handlerDecorator;
