@@ -25,24 +25,27 @@ A simple yet powerful pubsub system for Java and Kotlin.
  * Use JDK 1.8 or later
 
 ## Add as dependency
+
+Latest version: [![Maven Central][maven-badge]](https://search.maven.org/artifact/pw.stamina/pubsub4k)
+
 ### Maven
 ```xml
 <dependency>
   <groupId>pw.stamina</groupId>
   <artifactId>pubsub4k</artifactId>
-  <version>VERSION</version>
+  <version>{version}</version>
 </dependency>
 ```
 
 ### Gradle
 Groovy DSL:
 ```groovy
-implementation 'pw.stamina:pubsub4k:VERSION'
+implementation 'pw.stamina:pubsub4k:{version}'
 ```
 
 Kotlin DSL:
 ```kotlin
-implementation("pw.stamina:pubsub4k:VERSION")
+implementation("pw.stamina:pubsub4k:{version}")
 ```
 
 ## Quick start
