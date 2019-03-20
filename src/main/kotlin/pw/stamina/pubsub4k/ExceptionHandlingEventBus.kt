@@ -26,27 +26,32 @@ package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
 
-class ExceptionHandlingEventBus(
+internal class ExceptionHandlingEventBus(
         private val bus: EventBus,
         private val exceptionHandler: ExceptionHandler
 ) : EventBus by bus {
 
     override fun <T> getPublisher(topic: Topic<T>): Publisher<T> {
         val publisher = bus.getPublisher(topic)
+        return ExceptionHandlingPublisher(publisher, exceptionHandler)
+    }
+}
 
-        return object : Publisher<T> by publisher {
-            override fun publish(message: T) {
-                try {
-                    publisher.publish(message)
-                } catch (e: Exception) {
-                    exceptionHandler(e)
-                }
-            }
+internal class ExceptionHandlingPublisher<T>(
+        private val publisher: Publisher<T>,
+        private val exceptionHandler: ExceptionHandler
+) : Publisher<T> by publisher {
+
+    override fun publish(message: T) {
+        try {
+            publisher.publish(message)
+        } catch (e: Exception) {
+            exceptionHandler(e)
         }
     }
 }
 
-private typealias ExceptionHandler = (exception: Exception) -> Unit
+internal typealias ExceptionHandler = (exception: Exception) -> Unit
 
 fun EventBus.withExceptionHandling(exceptionHandler: ExceptionHandler): EventBus {
     return ExceptionHandlingEventBus(this, exceptionHandler)

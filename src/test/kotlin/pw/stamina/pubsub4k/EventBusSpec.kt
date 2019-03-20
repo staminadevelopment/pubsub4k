@@ -60,6 +60,15 @@ object EventBusSpec : Spek({
                 verify(bus).getPublisher(Any::class.java)
             }
         }
+
+        describe("withExceptionHandler") {
+            val exceptionHandler by memoized { mock<ExceptionHandler>() }
+            val busWithExceptionHandler by memoized { bus.withExceptionHandling(exceptionHandler) }
+
+            it("should return exception handling bus") {
+                busWithExceptionHandler.shouldBeInstanceOf<ExceptionHandlingEventBus>()
+            }
+        }
     }
 })
 
