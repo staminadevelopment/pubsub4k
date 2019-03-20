@@ -42,7 +42,6 @@ interface EventBus {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
         fun createDefaultBus(locking: Boolean = true): EventBus {
             val subscriptions = StandardSubscriptionRegistry()
             val publishers = StandardPublisherRegistry()
