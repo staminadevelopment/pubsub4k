@@ -31,8 +31,8 @@ import kotlin.concurrent.read
 import kotlin.concurrent.write
 
 class LockingSubscriptionRegistry(
-        private val lock: ReentrantReadWriteLock,
-        private val registry: SubscriptionRegistry
+        private val registry: SubscriptionRegistry,
+        private val lock: ReentrantReadWriteLock
 ) : SubscriptionRegistry {
 
     override fun register(subscription: Subscription<*>) = lock.write {

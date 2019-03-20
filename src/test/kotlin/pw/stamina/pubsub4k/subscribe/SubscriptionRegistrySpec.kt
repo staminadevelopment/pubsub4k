@@ -22,34 +22,37 @@
  * SOFTWARE.
  */
 
-package pw.stamina.pubsub4k.subscribe;
+package pw.stamina.pubsub4k.subscribe
 
-import org.jetbrains.annotations.NotNull;
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
+import pw.stamina.pubsub4k.MessageSubscriber
 
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+object SubscriptionRegistrySpec : Spek({
 
-public abstract class SubscriptionBuilder<T, U> {
+    val subscriber = object : MessageSubscriber {
 
-    @NotNull
-    public final SubscriptionBuilder<T, U> filterMessage(@NotNull Predicate<U> filter) {
-        return new DecoratingSubscriptionBuilder<>(this, (handler) -> (message) -> {
-            if (filter.test(message)) handler.accept(message);
-        });
+        val subscription = mock<Subscription<*>>()
+        val setOfSubscription = setOf(subscription)
+        val subscription2 = mock<Subscription<*>>()
+        val someBoolean = false
+
     }
 
-    @NotNull
-    public final <R> SubscriptionBuilder<T, R> mapped(@NotNull Function<U, R> mapper) {
-        return new DecoratingSubscriptionBuilder<>(this,
-                (handler) -> (message) -> handler.accept(mapper.apply(message)));
-    }
+    describe("A subscription registry") {
+        val registry by memoized { mock<SubscriptionRegistry>() }
 
-    @NotNull
-    public final <R> SubscriptionBuilder<T, R> filterMapped(@NotNull ContentFilterMapper<U, R> filterMapper) {
-        return filterMessage(filterMapper::filter).mapped(filterMapper::map);
-    }
+        describe("registering all subscriptions reflectively") {
+            beforeEach {
+                registry.registerAllReflectively(subscriber)
+            }
 
-    @NotNull
-    public abstract Subscription<T> build(@NotNull Consumer<U> messageHandler);
-}
+            it("should register subscriptions in subscriber") {
+                val subscriptions = setOf(subscriber.subscription, subscriber.subscription2)
+                verify(registry).registerAll(subscriptions)
+            }
+        }
+    }
+})
