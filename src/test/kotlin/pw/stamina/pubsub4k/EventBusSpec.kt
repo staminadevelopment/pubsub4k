@@ -24,7 +24,9 @@
 
 package pw.stamina.pubsub4k
 
+import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.stub
 import com.nhaarman.mockitokotlin2.verify
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
@@ -58,6 +60,20 @@ object EventBusSpec : Spek({
 
             it("should call normal getPublisher function") {
                 verify(bus).getPublisher(Any::class.java)
+            }
+        }
+
+        describe("withLocking") {
+            beforeEach {
+                bus.stub {
+                    on { subscriptions } doReturn mock()
+                }
+            }
+
+            val busWithLocking by memoized { bus.withLocking() }
+
+            it("should return locking bus") {
+                busWithLocking.shouldBeInstanceOf<LockingEventBus>()
             }
         }
     }

@@ -28,6 +28,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
+import pw.stamina.pubsub4k.LockingSubscriptionRegistry
 import pw.stamina.pubsub4k.MessageSubscriber
 import java.util.concurrent.locks.ReentrantReadWriteLock
 

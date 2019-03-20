@@ -34,7 +34,6 @@ import org.amshove.kluent.shouldBeInstanceOf
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import pw.stamina.pubsub4k.publish.Publisher
-import pw.stamina.pubsub4k.subscribe.LockingSubscriptionRegistry
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
 object LockingEventBusSpec : Spek({
