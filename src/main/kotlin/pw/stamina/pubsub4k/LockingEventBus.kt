@@ -40,3 +40,7 @@ class LockingEventBus(
         bus.getPublisher(topic)
     }
 }
+
+fun EventBus.withLocking(lock: ReentrantReadWriteLock = ReentrantReadWriteLock()): EventBus {
+    return LockingEventBus(this, lock)
+}

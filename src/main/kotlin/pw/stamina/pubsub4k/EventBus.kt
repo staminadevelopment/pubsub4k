@@ -28,7 +28,6 @@ import pw.stamina.pubsub4k.publish.Publisher
 import pw.stamina.pubsub4k.publish.StandardPublisherRegistry
 import pw.stamina.pubsub4k.subscribe.StandardSubscriptionRegistry
 import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
-import java.util.concurrent.locks.ReentrantReadWriteLock
 
 interface EventBus {
 
@@ -43,16 +42,14 @@ interface EventBus {
     companion object {
 
         @JvmStatic
+        @JvmOverloads
         fun createDefaultBus(locking: Boolean = true): EventBus {
             val subscriptions = StandardSubscriptionRegistry()
             val publishers = StandardPublisherRegistry()
 
             val bus = StandardEventBus(subscriptions, publishers)
 
-            return if (locking) {
-                val lock = ReentrantReadWriteLock()
-                LockingEventBus(bus, lock)
-            } else bus
+            return if (locking) bus.withLocking() else bus
         }
     }
 }
