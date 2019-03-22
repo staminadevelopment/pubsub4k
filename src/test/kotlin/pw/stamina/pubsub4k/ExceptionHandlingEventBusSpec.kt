@@ -34,13 +34,14 @@ import org.amshove.kluent.mock
 import org.amshove.kluent.shouldBeInstanceOf
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
+import pw.stamina.pubsub4k.publish.PublicationException
 import pw.stamina.pubsub4k.publish.Publisher
 
 object ExceptionHandlingEventBusSpec : Spek({
 
     describe("An exception handling event bus") {
 
-        val expectedException by memoized { RuntimeException("expected") }
+        val expectedException by memoized { mock<PublicationException>() }
         val mockedPublisher by memoized { mock<Publisher<Any>>() }
         val mockedBus by memoized {
             mock<EventBus> {

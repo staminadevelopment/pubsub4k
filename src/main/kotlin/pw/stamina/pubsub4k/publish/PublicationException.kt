@@ -26,7 +26,7 @@ package pw.stamina.pubsub4k.publish
 
 import pw.stamina.pubsub4k.subscribe.Subscription
 
-class PublicationException(
+open class PublicationException(
         val subscription: Subscription<*>,
         cause: Exception
 ) : RuntimeException(cause)
