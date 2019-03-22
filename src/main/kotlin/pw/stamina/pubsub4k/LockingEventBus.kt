@@ -25,11 +25,13 @@
 package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
-import pw.stamina.pubsub4k.subscribe.LockingSubscriptionRegistry
+import pw.stamina.pubsub4k.subscribe.Subscription
+import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
 import kotlin.concurrent.write
 
-class LockingEventBus(
+internal class LockingEventBus(
         private val bus: EventBus,
         private val lock: ReentrantReadWriteLock
 ) : EventBus {
@@ -39,4 +41,34 @@ class LockingEventBus(
     override fun <T> getPublisher(topic: Topic<T>): Publisher<T> = lock.write {
         bus.getPublisher(topic)
     }
+}
+
+internal class LockingSubscriptionRegistry(
+        private val registry: SubscriptionRegistry,
+        private val lock: ReentrantReadWriteLock
+) : SubscriptionRegistry {
+
+    override fun register(subscription: Subscription<*>) = lock.write {
+        registry.register(subscription)
+    }
+
+    override fun unregister(subscription: Subscription<*>) = lock.write {
+        registry.unregister(subscription)
+    }
+
+    override fun registerAll(subscriptions: Set<Subscription<*>>) = lock.write {
+        registry.registerAll(subscriptions)
+    }
+
+    override fun unregisterAll(subscriber: MessageSubscriber) = lock.write {
+        registry.unregisterAll(subscriber)
+    }
+
+    override fun <T> findSubscriptionsForTopic(topic: Topic<T>) = lock.read {
+        registry.findSubscriptionsForTopic(topic)
+    }
+}
+
+fun EventBus.withLocking(lock: ReentrantReadWriteLock = ReentrantReadWriteLock()): EventBus {
+    return LockingEventBus(this, lock)
 }
