@@ -22,31 +22,36 @@
  * SOFTWARE.
  */
 
-package pw.stamina.pubsub4k.publish
+package pw.stamina.pubsub4k
 
-import pw.stamina.pubsub4k.Topic
-import pw.stamina.pubsub4k.subscribe.Subscription
+import pw.stamina.pubsub4k.publish.PublicationException
+import pw.stamina.pubsub4k.publish.Publisher
 
-/**
- * The publisher interface provides the functionality to
- * publish messages to all registered subscriptions
- * for its [topic].
- */
-interface Publisher<T> {
+internal class ExceptionHandlingEventBus(
+        private val bus: EventBus,
+        private val exceptionHandler: ExceptionHandler
+) : EventBus by bus {
 
-    /**
-     * The topic of this publisher.
-     */
-    val topic: Topic<T>
+    override fun <T> getPublisher(topic: Topic<T>): Publisher<T> {
+        val publisher = bus.getPublisher(topic)
+        return ExceptionHandlingPublisher(publisher, exceptionHandler)
+    }
+}
 
-    /**
-     * The subscriptions registered for this publisher.
-     */
-    val subscriptions: Set<Subscription<T>>
+internal class ExceptionHandlingPublisher<T>(
+        private val publisher: Publisher<T>,
+        private val exceptionHandler: ExceptionHandler
+) : Publisher<T> by publisher {
 
-    /**
-     * Publishes the [message] to all its [subscriptions].
-     */
-    @Throws(PublicationException::class)
-    fun publish(message: T)
+    override fun publish(message: T) = try {
+        publisher.publish(message)
+    } catch (e: PublicationException) {
+        exceptionHandler(e)
+    }
+}
+
+internal typealias ExceptionHandler = (exception: PublicationException) -> Unit
+
+fun EventBus.withExceptionHandling(exceptionHandler: ExceptionHandler): EventBus {
+    return ExceptionHandlingEventBus(this, exceptionHandler)
 }

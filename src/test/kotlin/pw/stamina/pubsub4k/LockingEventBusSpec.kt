@@ -40,7 +40,7 @@ object LockingEventBusSpec : Spek({
     describe("A locking event bus") {
         val parentBus by memoized {
             mock<EventBus> {
-                on { this.subscriptions } doReturn mock()
+                on { subscriptions } doReturn mock()
             }
         }
 

@@ -79,7 +79,13 @@ internal class SingleSubscriptionPublisher<T>(
 
     override val subscriptions = setOf(subscription)
 
-    override fun publish(message: T) = messageHandler.accept(message)
+    override fun publish(message: T) {
+        try {
+            messageHandler.accept(message)
+        } catch (e: Exception) {
+            throw PublicationException(subscription, e)
+        }
+    }
 
     override fun added(subscription: Subscription<T>) =
             if (subscription == this.subscription) this else
@@ -93,8 +99,6 @@ internal class ManySubscriptionsPublisher<T>(
         override val subscriptions: Set<Subscription<T>>
 ) : OptimizedPublisher<T>() {
 
-    private val messageHandlers = subscriptions.mapTo(ArrayList()) { it.messageHandler }
-
     override fun publish(message: T) {
         /*
          * We pass a Consumer instance to use the Iterable#forEach
@@ -102,7 +106,13 @@ internal class ManySubscriptionsPublisher<T>(
          * ArrayList provides an optimized version that internally
          * iterates its array of elements.
         */
-        messageHandlers.forEach(Consumer { it.accept(message) })
+        subscriptions.forEach(Consumer { subscription ->
+            try {
+                subscription.messageHandler.accept(message)
+            } catch (e: Exception) {
+                throw PublicationException(subscription, e)
+            }
+        })
     }
 
     override fun added(subscription: Subscription<T>): OptimizedPublisher<T> {

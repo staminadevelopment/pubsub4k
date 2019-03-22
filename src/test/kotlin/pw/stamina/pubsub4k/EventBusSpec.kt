@@ -63,6 +63,15 @@ object EventBusSpec : Spek({
             }
         }
 
+        describe("withExceptionHandler") {
+            val exceptionHandler by memoized { mock<ExceptionHandler>() }
+            val busWithExceptionHandler by memoized { bus.withExceptionHandling(exceptionHandler) }
+
+            it("should return exception handling bus") {
+                busWithExceptionHandler.shouldBeInstanceOf<ExceptionHandlingEventBus>()
+            }
+        }
+
         describe("withLocking") {
             beforeEach {
                 bus.stub {
