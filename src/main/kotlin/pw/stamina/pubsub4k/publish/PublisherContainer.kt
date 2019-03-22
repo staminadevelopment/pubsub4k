@@ -41,7 +41,7 @@ import pw.stamina.pubsub4k.subscribe.Subscription
 class PublisherContainer<T>(
         override val topic: Topic<T>,
         subscriptions: Set<Subscription<T>>
-) : Publisher<T> {
+) : MutablePublisher<T> {
 
     private var publisher = OptimizedPublisher.fromSubscriptions(subscriptions)
 
@@ -52,24 +52,15 @@ class PublisherContainer<T>(
         publisher.publish(message)
     }
 
-    /**
-     * Adds the [subscription] to this container.
-     */
-    fun add(subscription: Subscription<T>) {
+    override fun add(subscription: Subscription<T>) {
         publisher = publisher.added(subscription)
     }
 
-    /**
-     * Removes the [subscription] from this container.
-     */
-    fun remove(subscription: Subscription<T>) {
+    override fun remove(subscription: Subscription<T>) {
         publisher = publisher.removed(subscription)
     }
 
-    /**
-     * Removes all [subscriptions] from this container.
-     */
-    fun clear() {
+    override fun clear() {
         publisher = OptimizedPublisher.empty()
     }
 }

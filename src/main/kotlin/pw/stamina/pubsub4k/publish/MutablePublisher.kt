@@ -22,15 +22,24 @@
  * SOFTWARE.
  */
 
-package pw.stamina.pubsub4k.subscribe;
+package pw.stamina.pubsub4k.publish
 
-import org.jetbrains.annotations.NotNull;
+import pw.stamina.pubsub4k.subscribe.Subscription
 
-import java.util.function.Consumer;
+interface MutablePublisher<T> : Publisher<T> {
 
-@FunctionalInterface
-public interface HandlerDecorator<T, R> {
+    /**
+     * Adds the [subscription] to this publisher.
+     */
+    fun add(subscription: Subscription<T>)
 
-    @NotNull
-    Consumer<T> decorateHandler(@NotNull Consumer<R> handler);
+    /**
+     * Removes the [subscription] from this publisher.
+     */
+    fun remove(subscription: Subscription<T>)
+
+    /**
+     * Removes all [subscriptions] from this publisher.
+     */
+    fun clear()
 }
