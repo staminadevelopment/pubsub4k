@@ -24,29 +24,9 @@
 
 package pw.stamina.pubsub4k.publish
 
-import pw.stamina.pubsub4k.Topic
 import pw.stamina.pubsub4k.subscribe.Subscription
 
-/**
- * The publisher interface provides the functionality to
- * publish messages to all registered subscriptions
- * for its [topic].
- */
-interface Publisher<T> {
-
-    /**
-     * The topic of this publisher.
-     */
-    val topic: Topic<T>
-
-    /**
-     * The subscriptions registered for this publisher.
-     */
-    val subscriptions: Set<Subscription<T>>
-
-    /**
-     * Publishes the [message] to all its [subscriptions].
-     */
-    @Throws(PublicationException::class)
-    fun publish(message: T)
-}
+class PublicationException(
+        val subscription: Subscription<*>,
+        cause: Exception
+) : RuntimeException(cause)
