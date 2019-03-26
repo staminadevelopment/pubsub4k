@@ -22,12 +22,19 @@
  * SOFTWARE.
  */
 
+import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    jacoco
     kotlin("jvm") version Versions.kotlin
+
+    jacoco
+    `maven-publish`
+    id("org.jetbrains.dokka") version Versions.dokka
 }
+
+group = "pw.stamina"
+version = "1.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -38,8 +45,8 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
     testImplementation(Dependencies.spekDslJvm)
-    testRuntimeOnly (Dependencies.spekRunnerJUnit5)
-    
+    testRuntimeOnly(Dependencies.spekRunnerJUnit5)
+
     testImplementation(Dependencies.kluent)
     testImplementation(Dependencies.mockitoKotlin)
 
@@ -71,4 +78,30 @@ tasks {
 
 jacoco {
     toolVersion = Versions.jacoco
+}
+
+val dokka by tasks.existing(DokkaTask::class) {
+    outputFormat = "javadoc"
+    outputDirectory = "$buildDir/javadoc"
+}
+
+val sourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allSource)
+}
+
+val javadocJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("javadoc")
+    from(dokka)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("pubsub4k") {
+            from(components["java"])
+
+            artifact(sourcesJar.get())
+            artifact(javadocJar.get())
+        }
+    }
 }
