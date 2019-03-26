@@ -26,20 +26,14 @@ package pw.stamina.pubsub4k.publish
 
 import pw.stamina.pubsub4k.subscribe.Subscription
 
-interface MutablePublisher<T> : Publisher<T> {
+interface MutablePublisher<T : Any> : Publisher<T> {
 
-    /**
-     * Adds the [subscription] to this publisher.
-     */
+    /** Adds the [subscription] to this publisher. */
     fun add(subscription: Subscription<T>)
 
-    /**
-     * Removes the [subscription] from this publisher.
-     */
+    /** Removes the [subscription] from this publisher. */
     fun remove(subscription: Subscription<T>)
 
-    /**
-     * Removes all [subscriptions] from this publisher.
-     */
+    /** Clears all the [subscriptions] from this publisher. */
     fun clear()
 }

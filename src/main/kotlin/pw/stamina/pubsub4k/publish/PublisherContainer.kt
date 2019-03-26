@@ -38,9 +38,9 @@ import pw.stamina.pubsub4k.subscribe.Subscription
  * is safe to publish to it from many threads, but only one
  * thread may update this class.
  */
-class PublisherContainer<T>(
-        override val topic: Topic<T>,
-        subscriptions: Set<Subscription<T>>
+class PublisherContainer<T : Any>(
+    override val topic: Topic<T>,
+    subscriptions: Set<Subscription<T>>
 ) : MutablePublisher<T> {
 
     private var publisher = OptimizedPublisher.fromSubscriptions(subscriptions)

@@ -28,8 +28,8 @@ import pw.stamina.pubsub4k.MessageSubscriber
 import pw.stamina.pubsub4k.publish.PublisherRegistry
 
 class PublisherUpdatingSubscriptionRegistry(
-        private val registry: SubscriptionRegistry,
-        private val publishers: PublisherRegistry
+    private val registry: SubscriptionRegistry,
+    private val publishers: PublisherRegistry
 ) : SubscriptionRegistry by registry {
 
     override fun register(subscription: Subscription<*>): Boolean {

@@ -32,32 +32,33 @@ class StandardPublisherRegistry : PublisherRegistry {
 
     private val publisherLookupMap = mutableMapOf<Topic<*>, MutablePublisher<*>>()
 
-    override fun <T> findPublisher(topic: Topic<T>): Publisher<T>? {
+    override fun <T : Any> findPublisher(topic: Topic<T>): Publisher<T>? {
         @Suppress("UNCHECKED_CAST")
         return publisherLookupMap[topic] as? Publisher<T>
     }
 
-    override fun <T> findOrCreatePublisher(
-            topic: Topic<T>, subscriptions: (Topic<T>) -> Set<Subscription<T>>): Publisher<T> {
+    override fun <T : Any> findOrCreatePublisher(
+        topic: Topic<T>, subscriptions: (Topic<T>) -> Set<Subscription<T>>
+    ): Publisher<T> {
         val publisherCreator = { PublisherContainer(topic, subscriptions(topic)) }
 
         @Suppress("UNCHECKED_CAST")
         return publisherLookupMap.getOrPut(topic, publisherCreator) as Publisher<T>
     }
 
-    override fun <T> findPublishersFor(subscription: Subscription<T>): Set<Publisher<T>> {
+    override fun <T : Any> findPublishersFor(subscription: Subscription<T>): Set<Publisher<T>> {
         val publishers = mutableSetOf<Publisher<T>>()
         forEachPublisherFor(subscription) { publishers.add(it) }
         return publishers
     }
 
-    override fun <T> addSubscriptionToPublishers(subscription: Subscription<T>) =
-            forEachPublisherFor(subscription) { it.add(subscription) }
+    override fun <T : Any> addSubscriptionToPublishers(subscription: Subscription<T>) =
+        forEachPublisherFor(subscription) { it.add(subscription) }
 
-    override fun <T> removeSubscriptionFromPublishers(subscription: Subscription<T>) =
-            forEachPublisherFor(subscription) { it.remove(subscription) }
+    override fun <T : Any> removeSubscriptionFromPublishers(subscription: Subscription<T>) =
+        forEachPublisherFor(subscription) { it.remove(subscription) }
 
-    private fun <T> forEachPublisherFor(subscription: Subscription<T>, action: (MutablePublisher<T>) -> Unit) {
+    private fun <T : Any> forEachPublisherFor(subscription: Subscription<T>, action: (MutablePublisher<T>) -> Unit) {
         publisherLookupMap.values.forEach { publisher ->
             if (publisher.topic.isSubtopicOf(subscription.topic)) {
                 @Suppress("UNCHECKED_CAST")
@@ -71,5 +72,5 @@ class StandardPublisherRegistry : PublisherRegistry {
     }
 
     override fun <T> removePublisher(topic: Topic<T>) =
-            publisherLookupMap.remove(topic)?.apply { clear() } != null
+        publisherLookupMap.remove(topic)?.apply { clear() } != null
 }

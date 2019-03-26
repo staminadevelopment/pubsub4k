@@ -42,11 +42,11 @@ interface SubscriptionRegistry {
 
 fun SubscriptionRegistry.registerAllReflectively(subscriber: MessageSubscriber) {
     val subscriptions = subscriber.javaClass.declaredFields.asSequence()
-            .filter { Subscription::class.java.isAssignableFrom(it.type) }
-            .onEach { it.isAccessible = true }
-            .map { it.get(subscriber) }
-            .filterIsInstance<Subscription<*>>()
-            .toSet()
+        .filter { Subscription::class.java.isAssignableFrom(it.type) }
+        .onEach { it.isAccessible = true }
+        .map { it.get(subscriber) }
+        .filterIsInstance<Subscription<*>>()
+        .toSet()
 
     registerAll(subscriptions)
 }

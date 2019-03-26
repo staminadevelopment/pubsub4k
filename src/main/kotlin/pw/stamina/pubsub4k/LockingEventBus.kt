@@ -32,20 +32,20 @@ import kotlin.concurrent.read
 import kotlin.concurrent.write
 
 internal class LockingEventBus(
-        private val bus: EventBus,
-        private val lock: ReentrantReadWriteLock
+    private val bus: EventBus,
+    private val lock: ReentrantReadWriteLock
 ) : EventBus {
 
     override val subscriptions = LockingSubscriptionRegistry(bus.subscriptions, lock)
 
-    override fun <T> getPublisher(topic: Topic<T>): Publisher<T> = lock.write {
+    override fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T> = lock.write {
         bus.getPublisher(topic)
     }
 }
 
 internal class LockingSubscriptionRegistry(
-        private val registry: SubscriptionRegistry,
-        private val lock: ReentrantReadWriteLock
+    private val registry: SubscriptionRegistry,
+    private val lock: ReentrantReadWriteLock
 ) : SubscriptionRegistry {
 
     override fun register(subscription: Subscription<*>) = lock.write {

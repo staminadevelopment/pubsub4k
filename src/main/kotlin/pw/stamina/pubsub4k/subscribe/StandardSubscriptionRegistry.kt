@@ -33,7 +33,7 @@ class StandardSubscriptionRegistry : SubscriptionRegistry {
     private val subscriberToSubscriptionMap = mutableMapOf<MessageSubscriber, MutableSet<Subscription<*>>>()
 
     override fun register(subscription: Subscription<*>) =
-            subscriberToSubscriptionMap.getOrPut(subscription.subscriber, ::mutableSetOf).add(subscription)
+        subscriberToSubscriptionMap.getOrPut(subscription.subscriber, ::mutableSetOf).add(subscription)
 
     override fun registerAll(subscriptions: Set<Subscription<*>>): Set<Subscription<*>> {
         return subscriptions.filterTo(mutableSetOf(), this::register)
@@ -49,10 +49,10 @@ class StandardSubscriptionRegistry : SubscriptionRegistry {
 
     override fun <T> findSubscriptionsForTopic(topic: Topic<T>): Set<Subscription<T>> {
         return subscriberToSubscriptionMap.values.asSequence().flatten()
-                .filter { topic.isSubtopicOf(it.topic) }
-                .filterIsInstance<Subscription<T>>()
-                .filterTo(mutableSetOf()) {
-                    it.topicFilter?.test(topic) != false
-                }
+            .filter { topic.isSubtopicOf(it.topic) }
+            .filterIsInstance<Subscription<T>>()
+            .filterTo(mutableSetOf()) {
+                it.topicFilter?.test(topic) != false
+            }
     }
 }

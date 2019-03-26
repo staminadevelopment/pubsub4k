@@ -29,18 +29,31 @@ import pw.stamina.pubsub4k.publish.StandardPublisherRegistry
 import pw.stamina.pubsub4k.subscribe.StandardSubscriptionRegistry
 import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
 
+/**
+ * The event bus is the central object
+ */
 interface EventBus {
 
+    /**
+     * The subscriptions registered for this event bus.
+     */
     val subscriptions: SubscriptionRegistry
 
     /**
      * Returns the publisher associated with the [topic], if
-     * a publisher does not exist a new one is created.
+     * a publisher does not already exist a new one is created.
+     *
+     * The [publisher][Publisher] allows users to publish their events
+     * to the the registered subscriptions.
      */
-    fun <T> getPublisher(topic: Topic<T>): Publisher<T>
+    fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T>
 
     companion object {
 
+        /**
+         * Returns a new event bus with
+         *
+         */
         @JvmStatic
         fun createDefaultBus(locking: Boolean = true): EventBus {
             val subscriptions = StandardSubscriptionRegistry()
@@ -57,10 +70,17 @@ interface EventBus {
  * Returns the publisher associated with the [T] topic, if
  * a publisher does not exist a new one is created.
  */
-inline fun <reified T> EventBus.getPublisher(): Publisher<T> {
+inline fun <reified T : Any> EventBus.getPublisher(): Publisher<T> {
     return this.getPublisher(T::class.java)
 }
 
 typealias Topic<T> = Class<T>
 
+/**
+ * Returns `true` if the [other] topic is a subclass/subtopic
+ * of this topic, otherwise returns `false`.
+ *
+ * A topic is a subtopic of another, if itself is
+ * [Class.isAssignableFrom] from the other topic.
+ */
 fun Topic<*>.isSubtopicOf(other: Topic<*>) = other.isAssignableFrom(this)

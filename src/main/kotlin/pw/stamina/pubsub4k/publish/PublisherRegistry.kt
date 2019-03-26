@@ -33,14 +33,17 @@ interface PublisherRegistry {
      * Finds the publisher associated with the specified
      * [topic], if none is found `null` is returned.
      */
-    fun <T> findPublisher(topic: Topic<T>): Publisher<T>?
+    fun <T : Any> findPublisher(topic: Topic<T>): Publisher<T>?
 
     /**
      * Finds the publisher associated with the specified
      * [topic], if none is found a new publisher is created
      * with the [topic] and [subscriptions], and registered.
      */
-    fun <T> findOrCreatePublisher(topic: Topic<T>, subscriptions: ((Topic<T>) -> Set<Subscription<T>>)): Publisher<T>
+    fun <T : Any> findOrCreatePublisher(
+        topic: Topic<T>,
+        subscriptions: ((Topic<T>) -> Set<Subscription<T>>)
+    ): Publisher<T>
 
     /**
      * Finds all the publishers which topic is accepted by
@@ -49,14 +52,14 @@ interface PublisherRegistry {
      * the publisher's topic and its [topic filter][Subscription.topicFilter]
      * is not null and accepts the topic.
      */
-    fun <T> findPublishersFor(subscription: Subscription<T>): Set<Publisher<T>>
+    fun <T : Any> findPublishersFor(subscription: Subscription<T>): Set<Publisher<T>>
 
     /**
      * Adds the subscription from all publishers
      */
-    fun <T> addSubscriptionToPublishers(subscription: Subscription<T>)
+    fun <T : Any> addSubscriptionToPublishers(subscription: Subscription<T>)
 
-    fun <T> removeSubscriptionFromPublishers(subscription: Subscription<T>)
+    fun <T : Any> removeSubscriptionFromPublishers(subscription: Subscription<T>)
 
     /**
      * Removes the publisher associated with the specified

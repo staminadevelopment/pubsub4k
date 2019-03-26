@@ -72,7 +72,7 @@ internal class EmptyPublisher<T> : OptimizedPublisher<T>() {
 }
 
 internal class SingleSubscriptionPublisher<T>(
-        private val subscription: Subscription<T>
+    private val subscription: Subscription<T>
 ) : OptimizedPublisher<T>() {
 
     private val messageHandler = subscription.messageHandler
@@ -88,15 +88,15 @@ internal class SingleSubscriptionPublisher<T>(
     }
 
     override fun added(subscription: Subscription<T>) =
-            if (subscription == this.subscription) this else
-                ManySubscriptionsPublisher(setOf(this.subscription, subscription))
+        if (subscription == this.subscription) this else
+            ManySubscriptionsPublisher(setOf(this.subscription, subscription))
 
     override fun removed(subscription: Subscription<T>) =
-            if (subscription == this.subscription) EmptyPublisher<T>() else this
+        if (subscription == this.subscription) EmptyPublisher<T>() else this
 }
 
 internal class ManySubscriptionsPublisher<T>(
-        override val subscriptions: Set<Subscription<T>>
+    override val subscriptions: Set<Subscription<T>>
 ) : OptimizedPublisher<T>() {
 
     override fun publish(message: T) {
@@ -126,6 +126,6 @@ internal class ManySubscriptionsPublisher<T>(
 
         val subscriptions = subscriptions - subscription
         return subscriptions.singleOrNull()?.let(::SingleSubscriptionPublisher)
-                ?: ManySubscriptionsPublisher(subscriptions)
+            ?: ManySubscriptionsPublisher(subscriptions)
     }
 }

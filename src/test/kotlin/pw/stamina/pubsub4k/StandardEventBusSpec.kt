@@ -35,8 +35,8 @@ object StandardEventBusSpec : Spek({
         val bus by memoized { EventBus.createDefaultBus(locking = false) }
 
         describe("bus subscriptions") {
-            it ("should be instance of PublisherUpdatingSubscriptionRegistry") {
-                bus.subscriptions shouldBeInstanceOf(PublisherUpdatingSubscriptionRegistry::class)
+            it("should be instance of PublisherUpdatingSubscriptionRegistry") {
+                bus.subscriptions shouldBeInstanceOf (PublisherUpdatingSubscriptionRegistry::class)
             }
         }
 

@@ -30,13 +30,13 @@ import pw.stamina.pubsub4k.subscribe.PublisherUpdatingSubscriptionRegistry
 import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
 
 class StandardEventBus(
-        subscriptions: SubscriptionRegistry,
-        private val publishers: PublisherRegistry
+    subscriptions: SubscriptionRegistry,
+    private val publishers: PublisherRegistry
 ) : EventBus {
 
     override val subscriptions = PublisherUpdatingSubscriptionRegistry(subscriptions, publishers)
 
-    override fun <T> getPublisher(topic: Topic<T>): Publisher<T> {
+    override fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T> {
         return publishers.findOrCreatePublisher(topic, subscriptions::findSubscriptionsForTopic)
     }
 }

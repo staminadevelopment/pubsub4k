@@ -29,12 +29,12 @@ import pw.stamina.pubsub4k.MessageSubscriber
 inline fun <reified T> MessageSubscriber.newSubscription() = Subscription.newSubscription(T::class.java, this)
 
 inline fun <reified T> MessageSubscriber.newSubscription(
-        noinline contentFilter: ((T) -> Boolean)? = null,
-        noinline messageHandler: (T) -> Unit
+    noinline contentFilter: ((T) -> Boolean)? = null,
+    noinline messageHandler: (T) -> Unit
 ): Subscription<T> {
     return newSubscription<T>()
-            .let { contentFilter?.let(it::filterMessage) ?: it }
-            .build(messageHandler)
+        .let { contentFilter?.let(it::filterMessage) ?: it }
+        .build(messageHandler)
 }
 
 operator fun <T, U> SubscriptionBuilder<T, U>.invoke(messageHandler: (U) -> Unit): Subscription<T> {
