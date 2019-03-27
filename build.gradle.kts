@@ -27,6 +27,7 @@ plugins {
 
 group = "pw.stamina"
 version = "1.0.0-SNAPSHOT"
+description = "A simple yet powerful pubsub system for Java and Kotlin."
 
 repositories {
     mavenCentral()
@@ -94,6 +95,33 @@ publishing {
 
             artifact(sourcesJar.get())
             artifact(javadocJar.get())
+
+            pom {
+                val projectUrl = "https://github.com/staminadevelopment/pubsub4k"
+
+                name.set(project.name)
+                description.set(project.description)
+                url.set(projectUrl)
+
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("feature")
+                        name.set("N3xuz")
+                        email.set("n3xuz@stamina.pw")
+                    }
+                }
+
+                scm {
+                    url.set(projectUrl)
+                }
+            }
         }
     }
 }
