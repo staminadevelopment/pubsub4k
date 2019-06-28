@@ -15,12 +15,12 @@
  */
 
 object Versions {
-    const val kotlin = "1.3.21"
+    const val kotlin = "1.3.40"
 
-    const val jacoco = "0.8.3"
+    const val jacoco = "0.8.4"
     const val dokka = "0.9.18"
 
-    const val spek = "2.0.1"
-    const val kluent = "1.48"
+    const val spek = "2.0.5"
+    const val kluent = "1.51"
     const val mockitoKotlin = "2.1.0"
 }

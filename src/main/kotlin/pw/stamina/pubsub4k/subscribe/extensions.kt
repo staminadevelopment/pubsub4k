@@ -18,15 +18,20 @@ package pw.stamina.pubsub4k.subscribe
 
 import pw.stamina.pubsub4k.MessageSubscriber
 
-inline fun <reified T> MessageSubscriber.newSubscription() = Subscription.newSubscription(T::class.java, this)
+inline fun <reified T> MessageSubscriber.newSubscription(): InitialSubscriptionBuilder<T> =
+    Subscription.newSubscription(T::class.java, this)
 
 inline fun <reified T> MessageSubscriber.newSubscription(
-    noinline contentFilter: ((T) -> Boolean)? = null,
+    noinline messageFilter: ((T) -> Boolean)? = null,
     noinline messageHandler: (T) -> Unit
 ): Subscription<T> {
-    return newSubscription<T>()
-        .let { contentFilter?.let(it::filterMessage) ?: it }
-        .build(messageHandler)
+    var subscription: SubscriptionBuilder<T, T> = newSubscription<T>()
+
+    if (messageFilter != null) {
+        subscription = subscription.filterMessage(messageFilter)
+    }
+
+    return subscription.build(messageHandler)
 }
 
 operator fun <T, U> SubscriptionBuilder<T, U>.invoke(messageHandler: (U) -> Unit): Subscription<T> {

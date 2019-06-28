@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -73,19 +72,19 @@ jacoco {
     toolVersion = Versions.jacoco
 }
 
-val dokka by tasks.existing(DokkaTask::class) {
-    outputFormat = "javadoc"
+tasks.dokka {
+    outputFormat = "html"
     outputDirectory = "$buildDir/javadoc"
 }
 
-val sourcesJar by tasks.registering(Jar::class) {
+val sourcesJar by tasks.creating(Jar::class) {
     archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
 }
 
-val javadocJar by tasks.registering(Jar::class) {
+val dokkaJar by tasks.creating(Jar::class) {
     archiveClassifier.set("javadoc")
-    from(dokka)
+    from(tasks.dokka)
 }
 
 publishing {
@@ -93,8 +92,8 @@ publishing {
         create<MavenPublication>("pubsub4k") {
             from(components["java"])
 
-            artifact(sourcesJar.get())
-            artifact(javadocJar.get())
+            artifact(sourcesJar)
+            artifact(dokkaJar)
 
             pom {
                 val projectUrl = "https://github.com/staminadevelopment/pubsub4k"
