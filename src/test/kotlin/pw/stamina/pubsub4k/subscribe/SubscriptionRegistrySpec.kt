@@ -16,35 +16,9 @@
 
 package pw.stamina.pubsub4k.subscribe
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
 import org.spekframework.spek2.Spek
-import org.spekframework.spek2.style.specification.describe
-import pw.stamina.pubsub4k.MessageSubscriber
 
 object SubscriptionRegistrySpec : Spek({
 
-    val subscriber = object : MessageSubscriber {
 
-        val subscription = mock<Subscription<Any>>()
-        val setOfSubscription = setOf(subscription)
-        val subscription2 = mock<Subscription<Any>>()
-        val someBoolean = false
-
-    }
-
-    describe("A subscription registry") {
-        val registry by memoized { mock<SubscriptionRegistry>() }
-
-        describe("registering all subscriptions reflectively") {
-            beforeEach {
-                registry.registerAllReflectively(subscriber)
-            }
-
-            it("should register subscriptions in subscriber") {
-                val subscriptions = setOf(subscriber.subscription, subscriber.subscription2)
-                verify(registry).registerAll(subscriptions)
-            }
-        }
-    }
 })

@@ -31,14 +31,3 @@ interface SubscriptionRegistry {
 
     fun <T> findSubscriptionsForTopic(topic: Topic<T>): Set<Subscription<T>>
 }
-
-fun SubscriptionRegistry.registerAllReflectively(subscriber: MessageSubscriber) {
-    val subscriptions = subscriber.javaClass.declaredFields.asSequence()
-        .filter { Subscription::class.java.isAssignableFrom(it.type) }
-        .onEach { it.isAccessible = true }
-        .map { it.get(subscriber) }
-        .filterIsInstance<Subscription<Any>>()
-        .toSet()
-
-    registerAll(subscriptions)
-}
