@@ -41,6 +41,8 @@ dependencies {
 
     testImplementation(Dependencies.kluent)
     testImplementation(Dependencies.mockitoKotlin)
+
+    testRuntimeOnly(kotlin("reflect"))
 }
 
 tasks.withType<KotlinCompile> {
