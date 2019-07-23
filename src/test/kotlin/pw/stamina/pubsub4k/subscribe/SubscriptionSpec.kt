@@ -18,12 +18,10 @@ package pw.stamina.pubsub4k.subscribe
 
 import com.nhaarman.mockitokotlin2.mock
 import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeInstanceOf
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import pw.stamina.pubsub4k.MessageSubscriber
 import pw.stamina.pubsub4k.Topic
-import pw.stamina.pubsub4k.subscribe.Subscription.newSubscription
 import java.util.function.Consumer
 import java.util.function.Predicate
 
@@ -51,17 +49,6 @@ object SubscriptionSpec : Spek({
 
         it("messageHandler should be specified messageHandler") {
             subscription.messageHandler shouldBe messageHandler
-        }
-    }
-
-    describe("newSubscription") {
-        val topic = Any::class.java
-        val subscriber by memoized { mock<MessageSubscriber>() }
-
-        val builder by memoized { newSubscription(topic, subscriber) }
-
-        it("should return new InitialSubscriptionBuilder") {
-            builder shouldBeInstanceOf InitialSubscriptionBuilder::class
         }
     }
 })

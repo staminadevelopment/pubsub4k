@@ -26,9 +26,9 @@ object SubscriptionRegistrySpec : Spek({
 
     val subscriber = object : MessageSubscriber {
 
-        val subscription = mock<Subscription<*>>()
+        val subscription = mock<Subscription<Any>>()
         val setOfSubscription = setOf(subscription)
-        val subscription2 = mock<Subscription<*>>()
+        val subscription2 = mock<Subscription<Any>>()
         val someBoolean = false
 
     }

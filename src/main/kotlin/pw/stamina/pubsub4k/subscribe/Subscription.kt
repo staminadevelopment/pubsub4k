@@ -25,7 +25,7 @@ import java.util.function.Predicate
 class Subscription<T>(
     val topic: Class<T>,
     val subscriber: MessageSubscriber,
-    val topicFilter: Predicate<Topic<T>>?,
+    val topicFilter: Predicate<Topic<out T>>?,
     /**
      * Handler function for the messages received by this
      * subscription.
