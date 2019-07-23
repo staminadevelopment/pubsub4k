@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package pw.stamina.pubsub4k.subscribe;
+package pw.stamina.pubsub4k.subscribe
 
-import org.jetbrains.annotations.NotNull;
+import pw.stamina.pubsub4k.MessageSubscriber
 
-import java.util.function.Consumer;
+import java.util.function.Consumer
+import java.util.function.Predicate
 
-@FunctionalInterface
-public interface HandlerDecorator<T, R> {
-
-    @NotNull
-    Consumer<T> decorateHandler(@NotNull Consumer<R> handler);
-}
+class Subscription<T>(
+    val topic: Class<T>,
+    val subscriber: MessageSubscriber,
+    val topicFilter: Predicate<Class<T>>?,
+    /**
+     * Handler function for the messages received by this
+     * subscription.
+     */
+    val messageHandler: Consumer<T>
+)
