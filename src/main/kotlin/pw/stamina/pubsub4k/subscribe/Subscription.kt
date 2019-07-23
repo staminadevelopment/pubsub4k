@@ -22,7 +22,7 @@ import pw.stamina.pubsub4k.Topic
 import java.util.function.Consumer
 import java.util.function.Predicate
 
-class Subscription<T>(
+class Subscription<T : Any>(
     val topic: Class<T>,
     val subscriber: MessageSubscriber,
     val topicFilter: Predicate<Topic<out T>>?,

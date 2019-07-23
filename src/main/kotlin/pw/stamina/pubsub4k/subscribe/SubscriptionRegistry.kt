@@ -21,13 +21,13 @@ import pw.stamina.pubsub4k.Topic
 
 interface SubscriptionRegistry {
 
-    fun register(subscription: Subscription<Any>): Boolean
+    fun register(subscription: Subscription<*>): Boolean
 
-    fun unregister(subscription: Subscription<Any>): Boolean
+    fun unregister(subscription: Subscription<*>): Boolean
 
-    fun registerAll(subscriptions: Set<Subscription<Any>>): Set<Subscription<Any>>
+    fun registerAll(subscriptions: Set<Subscription<*>>): Set<Subscription<*>>
 
-    fun unregisterAll(subscriber: MessageSubscriber): Set<Subscription<Any>>
+    fun unregisterAll(subscriber: MessageSubscriber): Set<Subscription<*>>
 
-    fun <T> findSubscriptionsForTopic(topic: Topic<T>): Set<Subscription<T>>
+    fun <T : Any> findSubscriptionsForTopic(topic: Topic<T>): Set<Subscription<T>>
 }

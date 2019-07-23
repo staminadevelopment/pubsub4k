@@ -24,7 +24,7 @@ import java.util.function.Consumer
  * class does not implement the [Publisher] interface to
  * avoid implementing the topic property.
  */
-sealed class OptimizedPublisher<T> {
+sealed class OptimizedPublisher<T : Any> {
 
     // From the Publisher interface
     abstract val subscriptions: Set<Subscription<T>>
@@ -40,20 +40,20 @@ sealed class OptimizedPublisher<T> {
     companion object {
 
         /** Returns a new publisher optimized for the specified [subscriptions]. */
-        fun <T> fromSubscriptions(subscriptions: Set<Subscription<T>>) = when (subscriptions.size) {
+        fun <T : Any> fromSubscriptions(subscriptions: Set<Subscription<T>>) = when (subscriptions.size) {
             0 -> empty()
             1 -> SingleSubscriptionPublisher(subscriptions.single())
             else -> ManySubscriptionsPublisher(subscriptions)
         }
 
         /** Returns a new publisher optimized for no registered subscriptions. */
-        fun <T> empty(): OptimizedPublisher<T> {
+        fun <T : Any> empty(): OptimizedPublisher<T> {
             return EmptyPublisher()
         }
     }
 }
 
-internal class EmptyPublisher<T> : OptimizedPublisher<T>() {
+internal class EmptyPublisher<T : Any> : OptimizedPublisher<T>() {
 
     override val subscriptions = emptySet<Subscription<T>>()
 
@@ -63,7 +63,7 @@ internal class EmptyPublisher<T> : OptimizedPublisher<T>() {
     override fun removed(subscription: Subscription<T>) = this
 }
 
-internal class SingleSubscriptionPublisher<T>(
+internal class SingleSubscriptionPublisher<T : Any>(
     private val subscription: Subscription<T>
 ) : OptimizedPublisher<T>() {
 
@@ -87,7 +87,7 @@ internal class SingleSubscriptionPublisher<T>(
         if (subscription == this.subscription) EmptyPublisher<T>() else this
 }
 
-internal class ManySubscriptionsPublisher<T>(
+internal class ManySubscriptionsPublisher<T : Any>(
     override val subscriptions: Set<Subscription<T>>
 ) : OptimizedPublisher<T>() {
 
@@ -97,6 +97,8 @@ internal class ManySubscriptionsPublisher<T>(
          * method from Java instead of the Kotlin version, because
          * ArrayList provides an optimized version that internally
          * iterates its array of elements.
+         *
+         * TODO: This doesn't actually use an ArrayList
         */
         subscriptions.forEach(Consumer { subscription ->
             try {

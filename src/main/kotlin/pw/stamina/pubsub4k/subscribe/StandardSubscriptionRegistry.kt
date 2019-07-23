@@ -22,24 +22,23 @@ import pw.stamina.pubsub4k.isSubtopicOf
 
 class StandardSubscriptionRegistry : SubscriptionRegistry {
 
-    private val subscriberToSubscriptionMap = mutableMapOf<MessageSubscriber, MutableSet<Subscription<Any>>>()
+    private val subscriberToSubscriptionMap = mutableMapOf<MessageSubscriber, MutableSet<Subscription<*>>>()
 
-    override fun register(subscription: Subscription<Any>) =
+    override fun register(subscription: Subscription<*>) =
         subscriberToSubscriptionMap.getOrPut(subscription.subscriber, ::mutableSetOf).add(subscription)
 
-    override fun registerAll(subscriptions: Set<Subscription<Any>>): Set<Subscription<Any>> {
-        return subscriptions.filterTo(mutableSetOf(), this::register)
-    }
+    override fun registerAll(subscriptions: Set<Subscription<*>>) =
+        subscriptions.filterTo(mutableSetOf(), this::register)
 
-    override fun unregister(subscription: Subscription<Any>): Boolean {
+    override fun unregister(subscription: Subscription<*>): Boolean {
         return subscriberToSubscriptionMap[subscription.subscriber]?.remove(subscription) ?: false
     }
 
-    override fun unregisterAll(subscriber: MessageSubscriber): Set<Subscription<Any>> {
+    override fun unregisterAll(subscriber: MessageSubscriber): Set<Subscription<*>> {
         return subscriberToSubscriptionMap.remove(subscriber) ?: emptySet()
     }
 
-    override fun <T> findSubscriptionsForTopic(topic: Topic<T>): Set<Subscription<T>> {
+    override fun <T : Any> findSubscriptionsForTopic(topic: Topic<T>): Set<Subscription<T>> {
         return subscriberToSubscriptionMap.values.asSequence().flatten()
             .filter { topic.isSubtopicOf(it.topic) }
             .filterIsInstance<Subscription<T>>()

@@ -39,9 +39,9 @@ class StandardPublisherRegistry : PublisherRegistry {
     }
 
     override fun <T : Any> findPublishersFor(subscription: Subscription<T>): Set<Publisher<T>> {
-        val publishers = mutableSetOf<Publisher<T>>()
-        forEachPublisherFor(subscription) { publishers.add(it) }
-        return publishers
+        return mutableSetOf<Publisher<T>>().also { publishers ->
+            forEachPublisherFor(subscription) { subscription -> publishers.add(subscription) }
+        }
     }
 
     override fun <T : Any> addSubscriptionToPublishers(subscription: Subscription<T>) =
@@ -50,7 +50,10 @@ class StandardPublisherRegistry : PublisherRegistry {
     override fun <T : Any> removeSubscriptionFromPublishers(subscription: Subscription<T>) =
         forEachPublisherFor(subscription) { it.remove(subscription) }
 
-    private fun <T : Any> forEachPublisherFor(subscription: Subscription<T>, action: (MutablePublisher<T>) -> Unit) {
+    private fun <T : Any> forEachPublisherFor(
+        subscription: Subscription<T>,
+        action: (MutablePublisher<T>) -> Unit
+    ) {
         publisherLookupMap.values.forEach { publisher ->
             if (publisher.topic.isSubtopicOf(subscription.topic)) {
                 @Suppress("UNCHECKED_CAST")
