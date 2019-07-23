@@ -22,20 +22,20 @@ import pw.stamina.pubsub4k.isSubtopicOf
 
 class StandardSubscriptionRegistry : SubscriptionRegistry {
 
-    private val subscriberToSubscriptionMap = mutableMapOf<MessageSubscriber, MutableSet<Subscription<*>>>()
+    private val subscriberToSubscriptionMap = mutableMapOf<MessageSubscriber, MutableSet<Subscription<Any>>>()
 
-    override fun register(subscription: Subscription<*>) =
+    override fun register(subscription: Subscription<Any>) =
         subscriberToSubscriptionMap.getOrPut(subscription.subscriber, ::mutableSetOf).add(subscription)
 
-    override fun registerAll(subscriptions: Set<Subscription<*>>): Set<Subscription<*>> {
+    override fun registerAll(subscriptions: Set<Subscription<Any>>): Set<Subscription<Any>> {
         return subscriptions.filterTo(mutableSetOf(), this::register)
     }
 
-    override fun unregister(subscription: Subscription<*>): Boolean {
+    override fun unregister(subscription: Subscription<Any>): Boolean {
         return subscriberToSubscriptionMap[subscription.subscriber]?.remove(subscription) ?: false
     }
 
-    override fun unregisterAll(subscriber: MessageSubscriber): Set<Subscription<*>> {
+    override fun unregisterAll(subscriber: MessageSubscriber): Set<Subscription<Any>> {
         return subscriberToSubscriptionMap.remove(subscriber) ?: emptySet()
     }
 

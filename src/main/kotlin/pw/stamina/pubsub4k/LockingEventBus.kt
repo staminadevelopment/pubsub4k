@@ -40,15 +40,15 @@ internal class LockingSubscriptionRegistry(
     private val lock: ReentrantReadWriteLock
 ) : SubscriptionRegistry {
 
-    override fun register(subscription: Subscription<*>) = lock.write {
+    override fun register(subscription: Subscription<Any>) = lock.write {
         registry.register(subscription)
     }
 
-    override fun unregister(subscription: Subscription<*>) = lock.write {
+    override fun unregister(subscription: Subscription<Any>) = lock.write {
         registry.unregister(subscription)
     }
 
-    override fun registerAll(subscriptions: Set<Subscription<*>>) = lock.write {
+    override fun registerAll(subscriptions: Set<Subscription<Any>>) = lock.write {
         registry.registerAll(subscriptions)
     }
 

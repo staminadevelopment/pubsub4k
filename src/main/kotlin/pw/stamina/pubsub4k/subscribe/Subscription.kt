@@ -17,6 +17,7 @@
 package pw.stamina.pubsub4k.subscribe
 
 import pw.stamina.pubsub4k.MessageSubscriber
+import pw.stamina.pubsub4k.Topic
 
 import java.util.function.Consumer
 import java.util.function.Predicate
@@ -24,7 +25,7 @@ import java.util.function.Predicate
 class Subscription<T>(
     val topic: Class<T>,
     val subscriber: MessageSubscriber,
-    val topicFilter: Predicate<Class<T>>?,
+    val topicFilter: Predicate<Topic<T>>?,
     /**
      * Handler function for the messages received by this
      * subscription.

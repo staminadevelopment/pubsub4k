@@ -21,13 +21,13 @@ import pw.stamina.pubsub4k.Topic
 
 interface SubscriptionRegistry {
 
-    fun register(subscription: Subscription<*>): Boolean
+    fun register(subscription: Subscription<Any>): Boolean
 
-    fun unregister(subscription: Subscription<*>): Boolean
+    fun unregister(subscription: Subscription<Any>): Boolean
 
-    fun registerAll(subscriptions: Set<Subscription<*>>): Set<Subscription<*>>
+    fun registerAll(subscriptions: Set<Subscription<Any>>): Set<Subscription<Any>>
 
-    fun unregisterAll(subscriber: MessageSubscriber): Set<Subscription<*>>
+    fun unregisterAll(subscriber: MessageSubscriber): Set<Subscription<Any>>
 
     fun <T> findSubscriptionsForTopic(topic: Topic<T>): Set<Subscription<T>>
 }
@@ -37,7 +37,7 @@ fun SubscriptionRegistry.registerAllReflectively(subscriber: MessageSubscriber) 
         .filter { Subscription::class.java.isAssignableFrom(it.type) }
         .onEach { it.isAccessible = true }
         .map { it.get(subscriber) }
-        .filterIsInstance<Subscription<*>>()
+        .filterIsInstance<Subscription<Any>>()
         .toSet()
 
     registerAll(subscriptions)
