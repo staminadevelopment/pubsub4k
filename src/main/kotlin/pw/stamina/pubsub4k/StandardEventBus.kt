@@ -28,10 +28,22 @@ class StandardEventBus(
     private val publishers: PublisherRegistry
 ) : EventBus {
 
-    override val subscriptions = PublisherUpdatingSubscriptionRegistry(subscriptions, publishers)
+    private val subscriptions = PublisherUpdatingSubscriptionRegistry(subscriptions, publishers)
+
+    override fun addSubscription(subscription: Subscription<*>) {
+        subscriptions.register(subscription)
+    }
+
+    override fun removeSubscription(subscription: Subscription<*>) {
+        subscriptions.unregister(subscription)
+    }
+
+    override fun removeAllSubscriptions(subscriber: MessageSubscriber) {
+        subscriptions.unregisterAll(subscriber)
+    }
 
     override fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>) {
-        subscriptions.register(Subscription(topic, subscriber, null, handler))
+        addSubscription(Subscription(topic, subscriber, null, handler))
     }
 
     override fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>) {
@@ -40,11 +52,15 @@ class StandardEventBus(
 
         subscriptionRemovingConsumer.subscription = subscription
 
-        subscriptions.register(subscription)
+        addSubscription(subscription)
     }
 
     override fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T> {
         return publishers.findOrCreatePublisher(topic, subscriptions::findSubscriptionsForTopic)
+    }
+
+    override fun disposePublisher(topic: Topic<*>) {
+        publishers.removePublisher(topic)
     }
 
     class SubscriptionRemovingConsumer<T : Any>(
@@ -54,7 +70,7 @@ class StandardEventBus(
         internal lateinit var subscription: Subscription<T>
 
         override fun accept(message: T) {
-            bus.subscriptions.unregister(subscription)
+            bus.removeSubscription(subscription)
             handler.accept(message)
         }
     }

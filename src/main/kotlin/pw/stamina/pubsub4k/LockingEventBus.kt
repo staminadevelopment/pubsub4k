@@ -28,8 +28,6 @@ internal class LockingEventBus(
     private val lock: ReentrantReadWriteLock
 ) : EventBus by bus {
 
-    override val subscriptions = LockingSubscriptionRegistry(bus.subscriptions, lock)
-
     override fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T> = lock.write {
         bus.getPublisher(topic)
     }

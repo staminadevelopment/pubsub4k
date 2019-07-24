@@ -19,7 +19,7 @@ package pw.stamina.pubsub4k
 import pw.stamina.pubsub4k.publish.Publisher
 import pw.stamina.pubsub4k.publish.StandardPublisherRegistry
 import pw.stamina.pubsub4k.subscribe.StandardSubscriptionRegistry
-import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
+import pw.stamina.pubsub4k.subscribe.Subscription
 import java.util.function.Consumer
 
 /**
@@ -27,10 +27,11 @@ import java.util.function.Consumer
  */
 interface EventBus {
 
-    /**
-     * The subscriptions registered for this event bus.
-     */
-    val subscriptions: SubscriptionRegistry
+    fun addSubscription(subscription: Subscription<*>)
+
+    fun removeSubscription(subscription: Subscription<*>)
+
+    fun removeAllSubscriptions(subscriber: MessageSubscriber)
 
     fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>)
 
@@ -44,6 +45,8 @@ interface EventBus {
      * to the the registered subscriptions.
      */
     fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T>
+
+    fun disposePublisher(topic: Topic<*>)
 
     companion object {
 

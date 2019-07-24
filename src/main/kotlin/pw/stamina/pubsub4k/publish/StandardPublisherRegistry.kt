@@ -26,7 +26,7 @@ class StandardPublisherRegistry : PublisherRegistry {
 
     override fun <T : Any> findPublisher(topic: Topic<T>): Publisher<T>? {
         @Suppress("UNCHECKED_CAST")
-        return publisherLookupMap[topic] as? Publisher<T>
+        return publisherLookupMap[topic] as Publisher<T>
     }
 
     override fun <T : Any> findOrCreatePublisher(
@@ -66,6 +66,6 @@ class StandardPublisherRegistry : PublisherRegistry {
         }
     }
 
-    override fun <T> removePublisher(topic: Topic<T>) =
+    override fun removePublisher(topic: Topic<*>) =
         publisherLookupMap.remove(topic)?.apply { clear() } != null
 }
