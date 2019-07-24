@@ -18,28 +18,31 @@ package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
 import pw.stamina.pubsub4k.publish.PublisherRegistry
-import pw.stamina.pubsub4k.subscribe.PublisherUpdatingSubscriptionRegistry
 import pw.stamina.pubsub4k.subscribe.Subscription
 import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
 import java.util.function.Consumer
 
 class StandardEventBus(
-    subscriptions: SubscriptionRegistry,
+    private val subscriptions: SubscriptionRegistry,
     private val publishers: PublisherRegistry
 ) : EventBus {
 
-    private val subscriptions = PublisherUpdatingSubscriptionRegistry(subscriptions, publishers)
-
     override fun addSubscription(subscription: Subscription<*>) {
-        subscriptions.register(subscription)
+        if (subscriptions.register(subscription)) {
+            publishers.addSubscriptionToPublishers(subscription)
+        }
     }
 
     override fun removeSubscription(subscription: Subscription<*>) {
-        subscriptions.unregister(subscription)
+        if (subscriptions.unregister(subscription)) {
+            publishers.removeSubscriptionFromPublishers(subscription)
+        }
     }
 
     override fun removeAllSubscriptions(subscriber: MessageSubscriber) {
-        subscriptions.unregisterAll(subscriber)
+        val unregisteredSubscriptions = subscriptions.unregisterAll(subscriber)
+
+        unregisteredSubscriptions.forEach { publishers.removeSubscriptionFromPublishers(it) }
     }
 
     override fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>) {
