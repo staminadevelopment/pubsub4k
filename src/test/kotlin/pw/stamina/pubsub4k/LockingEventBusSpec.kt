@@ -17,24 +17,75 @@
 package pw.stamina.pubsub4k
 
 import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
 import com.nhaarman.mockitokotlin2.verify
 import org.amshove.kluent.mock
 import org.amshove.kluent.shouldBe
+import org.mockito.Mockito
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import pw.stamina.pubsub4k.publish.Publisher
-import java.util.concurrent.locks.ReentrantReadWriteLock
+import pw.stamina.pubsub4k.subscribe.Subscription
+import java.util.function.Consumer
 
 object LockingEventBusSpec : Spek({
-    // TODO: Rewrite tests
     describe("A locking event bus") {
-        val parentBus by memoized { mock<EventBus>() }
+        val parentBus by memoized {
+            mock<EventBus>(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
+        }
 
-        lateinit var lockingBus: EventBus
-        beforeEach {
-            val lock = ReentrantReadWriteLock()
-            lockingBus = LockingEventBus(parentBus, lock)
+        val lockingBus by memoized {
+            parentBus.withLocking()
+        }
+
+        describe("adding subscription") {
+            val subscription by memoized { mock<Subscription<Any>>() }
+
+            it("should add to parent bus") {
+                lockingBus.addSubscription(subscription)
+                verify(parentBus).addSubscription(subscription)
+            }
+        }
+
+        describe("removing subscription") {
+            val subscription by memoized { mock<Subscription<Any>>() }
+
+            it("should remove from parent bus") {
+                lockingBus.removeSubscription(subscription)
+                verify(parentBus).removeSubscription(subscription)
+            }
+        }
+
+        describe("removing all subscriptions for subscriber") {
+            val subscriber by memoized { mock<MessageSubscriber>() }
+
+            it("should remove all subscriptions for subscriber from parent bus") {
+                lockingBus.removeAllSubscriptions(subscriber)
+                verify(parentBus).removeAllSubscriptions(subscriber)
+            }
+        }
+
+        describe("adding subscription using on") {
+            val topic = Any::class.java
+            val handler = Consumer<Any> {}
+            val subscriber by memoized { mock<MessageSubscriber>() }
+
+            it("should add subscription to parent bus using on") {
+                lockingBus.on(topic, subscriber, handler)
+                verify(parentBus).on(topic, subscriber, handler)
+            }
+        }
+
+        describe("adding subscription using once") {
+            val topic = Any::class.java
+            val handler = Consumer<Any> {}
+            val subscriber by memoized { mock<MessageSubscriber>() }
+
+            it("should add subscription to parent bus using once") {
+                lockingBus.once(topic, subscriber, handler)
+                verify(parentBus).once(topic, subscriber, handler)
+            }
         }
 
         describe("getting publisher by topic") {
@@ -52,6 +103,15 @@ object LockingEventBusSpec : Spek({
                 lockingBusPublisher shouldBe mockedPublisher
 
                 verify(parentBus).getPublisher<Any>()
+            }
+        }
+
+        describe("disposing publisher by topic") {
+            val topic = Any::class.java
+
+            it("should dispose publisher from parent bus by topic") {
+                lockingBus.disposePublisher(topic)
+                verify(parentBus).disposePublisher(topic)
             }
         }
     }
