@@ -26,7 +26,7 @@ import kotlin.concurrent.write
 internal class LockingEventBus(
     private val bus: EventBus,
     private val lock: ReentrantReadWriteLock
-) : EventBus {
+) : EventBus by bus {
 
     override val subscriptions = LockingSubscriptionRegistry(bus.subscriptions, lock)
 

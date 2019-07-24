@@ -20,6 +20,7 @@ import pw.stamina.pubsub4k.publish.Publisher
 import pw.stamina.pubsub4k.publish.StandardPublisherRegistry
 import pw.stamina.pubsub4k.subscribe.StandardSubscriptionRegistry
 import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
+import java.util.function.Consumer
 
 /**
  * The event bus is the central object
@@ -30,6 +31,10 @@ interface EventBus {
      * The subscriptions registered for this event bus.
      */
     val subscriptions: SubscriptionRegistry
+
+    fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>)
+
+    fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>)
 
     /**
      * Returns the publisher associated with the [topic], if
@@ -57,22 +62,3 @@ interface EventBus {
         }
     }
 }
-
-/**
- * Returns the publisher associated with the [T] topic, if
- * a publisher does not exist a new one is created.
- */
-inline fun <reified T : Any> EventBus.getPublisher(): Publisher<T> {
-    return this.getPublisher(T::class.java)
-}
-
-typealias Topic<T> = Class<T>
-
-/**
- * Returns `true` if the [other] topic is a subclass/subtopic
- * of this topic, otherwise returns `false`.
- *
- * A topic is a subtopic of another, if itself is
- * [Class.isAssignableFrom] from the other topic.
- */
-fun Topic<*>.isSubtopicOf(other: Topic<*>) = other.isAssignableFrom(this)
