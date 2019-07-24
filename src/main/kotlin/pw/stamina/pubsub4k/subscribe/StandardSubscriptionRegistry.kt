@@ -27,9 +27,6 @@ class StandardSubscriptionRegistry : SubscriptionRegistry {
     override fun register(subscription: Subscription<*>) =
         subscriberToSubscriptionMap.getOrPut(subscription.subscriber, ::mutableSetOf).add(subscription)
 
-    override fun registerAll(subscriptions: Set<Subscription<*>>) =
-        subscriptions.filterTo(mutableSetOf(), this::register)
-
     override fun unregister(subscription: Subscription<*>): Boolean {
         return subscriberToSubscriptionMap[subscription.subscriber]?.remove(subscription) ?: false
     }
