@@ -16,21 +16,13 @@
 
 package pw.stamina.pubsub4k
 
-import org.amshove.kluent.shouldBeInstanceOf
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import pw.stamina.pubsub4k.subscribe.PublisherUpdatingSubscriptionRegistry
 
 object StandardEventBusSpec : Spek({
     describe("Standard event bus instance") {
         //TODO: Replace factory function with direct instantiation with mocks
         val bus by memoized { EventBus.createDefaultBus(locking = false) }
-
-        describe("bus subscriptions") {
-            it("should be instance of PublisherUpdatingSubscriptionRegistry") {
-                bus.subscriptions shouldBeInstanceOf (PublisherUpdatingSubscriptionRegistry::class)
-            }
-        }
 
         describe("get publisher") {
             it("should get publisher from specified publishers, with subscriptions from specified subscriptions") {

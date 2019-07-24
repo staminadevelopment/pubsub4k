@@ -17,40 +17,24 @@
 package pw.stamina.pubsub4k
 
 import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
 import com.nhaarman.mockitokotlin2.verify
 import org.amshove.kluent.mock
 import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeInstanceOf
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import pw.stamina.pubsub4k.publish.Publisher
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
 object LockingEventBusSpec : Spek({
+    // TODO: Rewrite tests
     describe("A locking event bus") {
-        val parentBus by memoized {
-            mock<EventBus> {
-                on { subscriptions } doReturn mock()
-            }
-        }
+        val parentBus by memoized { mock<EventBus>() }
 
         lateinit var lockingBus: EventBus
         beforeEach {
             val lock = ReentrantReadWriteLock()
             lockingBus = LockingEventBus(parentBus, lock)
-        }
-
-        describe("subscriptions should be locking") {
-
-            it("should get subscriptions from parentBus") {
-                verify(parentBus).subscriptions
-            }
-
-            it("should return locking subscriptions implementation") {
-                lockingBus.subscriptions.shouldBeInstanceOf<LockingSubscriptionRegistry>()
-            }
         }
 
         describe("getting publisher by topic") {
