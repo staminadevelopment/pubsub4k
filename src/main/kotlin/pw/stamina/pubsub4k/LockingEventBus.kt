@@ -18,44 +18,45 @@ package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
 import pw.stamina.pubsub4k.subscribe.Subscription
-import java.util.concurrent.locks.ReentrantReadWriteLock
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReentrantLock
 import java.util.function.Consumer
-import kotlin.concurrent.write
+import kotlin.concurrent.withLock
 
 internal class LockingEventBus(
     private val bus: EventBus,
-    private val lock: ReentrantReadWriteLock
+    private val lock: Lock
 ) : EventBus {
 
-    override fun addSubscription(subscription: Subscription<*>) = lock.write {
+    override fun addSubscription(subscription: Subscription<*>) = lock.withLock {
         bus.addSubscription(subscription)
     }
 
-    override fun removeSubscription(subscription: Subscription<*>) = lock.write {
+    override fun removeSubscription(subscription: Subscription<*>) = lock.withLock {
         bus.removeSubscription(subscription)
     }
 
-    override fun removeAllSubscriptions(subscriber: MessageSubscriber) = lock.write {
+    override fun removeAllSubscriptions(subscriber: MessageSubscriber) = lock.withLock {
         bus.removeAllSubscriptions(subscriber)
     }
 
-    override fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>) = lock.write {
+    override fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>) = lock.withLock {
         bus.on(topic, subscriber, handler)
     }
 
-    override fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>) = lock.write {
+    override fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>) = lock.withLock {
         bus.once(topic, subscriber, handler)
     }
 
-    override fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T> = lock.write {
+    override fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T> = lock.withLock {
         return bus.getPublisher(topic)
     }
 
-    override fun disposePublisher(topic: Topic<*>) = lock.write {
+    override fun disposePublisher(topic: Topic<*>) = lock.withLock {
         bus.disposePublisher(topic)
     }
 }
 
-fun EventBus.withLocking(lock: ReentrantReadWriteLock = ReentrantReadWriteLock()): EventBus {
+fun EventBus.withLocking(lock: Lock = ReentrantLock()): EventBus {
     return LockingEventBus(this, lock)
 }
