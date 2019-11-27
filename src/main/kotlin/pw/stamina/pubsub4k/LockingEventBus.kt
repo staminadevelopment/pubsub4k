@@ -17,6 +17,7 @@
 package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
+import pw.stamina.pubsub4k.subscribe.CancellableMessageHandler
 import pw.stamina.pubsub4k.subscribe.MessageHandler
 import pw.stamina.pubsub4k.subscribe.Subscription
 import java.util.concurrent.locks.Lock
@@ -42,6 +43,14 @@ internal class LockingEventBus(
 
     override fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>) = lock.withLock {
         bus.on(topic, subscriber, handler)
+    }
+
+    override fun <T : Any> cancellableOn(
+        topic: Topic<T>,
+        subscriber: MessageSubscriber,
+        handler: CancellableMessageHandler<T>
+    ) = lock.withLock {
+        bus.cancellableOn(topic, subscriber, handler)
     }
 
     override fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>) = lock.withLock {

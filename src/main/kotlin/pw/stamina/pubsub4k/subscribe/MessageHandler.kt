@@ -27,3 +27,39 @@ interface MessageHandler<T : Any> {
             }
     }
 }
+
+class CancellableSubscription<T : Any>(
+    val handler: CancellableMessageHandler<T>
+) {
+
+}
+
+/*
+class CancellableMessageHandler<T : Any>(
+    private val handler: MessageHandler<T>
+) : MessageHandler<T> {
+    lateinit var cancel: () -> Unit
+
+    override fun handle(message: T) {
+        cancel()
+        handler.handle(message)
+    }
+
+}
+*/
+
+interface CancellableMessageHandler<T : Any> : MessageHandler<T> {
+
+    var cancel: () -> Unit
+
+    companion object {
+        inline fun <T : Any> newCancellableHandler(crossinline handler: (T) -> Boolean) =
+            object : CancellableMessageHandler<T> {
+                override lateinit var cancel: () -> Unit
+
+                override fun handle(message: T) {
+                    if (handler(message)) cancel()
+                }
+            }
+    }
+}

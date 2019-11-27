@@ -18,6 +18,7 @@ package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
 import pw.stamina.pubsub4k.publish.PublisherRegistry
+import pw.stamina.pubsub4k.subscribe.CancellableMessageHandler
 import pw.stamina.pubsub4k.subscribe.MessageHandler
 import pw.stamina.pubsub4k.subscribe.Subscription
 import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
@@ -49,13 +50,25 @@ class StandardEventBus(
         addSubscription(Subscription(topic, subscriber, null, handler))
     }
 
-    override fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>) {
-        val subscriptionRemovingMessageHandler = SubscriptionRemovingMessageHandler(this, handler)
-        val subscription = Subscription(topic, subscriber, null, subscriptionRemovingMessageHandler)
+    override fun <T : Any> cancellableOn(
+        topic: Topic<T>,
+        subscriber: MessageSubscriber,
+        handler: CancellableMessageHandler<T>
+    ) {
+        val subscription = Subscription(topic, subscriber, null, handler)
 
-        subscriptionRemovingMessageHandler.subscription = subscription
+        handler.cancel = {
+            removeSubscription(subscription)
+        }
 
         addSubscription(subscription)
+    }
+
+    override fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>) {
+        cancellableOn(topic, subscriber, CancellableMessageHandler.newCancellableHandler {
+            handler.handle(it)
+            true
+        })
     }
 
     override fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T> {
@@ -64,17 +77,5 @@ class StandardEventBus(
 
     override fun disposePublisher(topic: Topic<*>) {
         publishers.removePublisher(topic)
-    }
-
-    class SubscriptionRemovingMessageHandler<T : Any>(
-        private val bus: EventBus,
-        private val handler: MessageHandler<T>
-    ) : MessageHandler<T> {
-        internal lateinit var subscription: Subscription<T>
-
-        override fun handle(message: T) {
-            bus.removeSubscription(subscription)
-            handler.handle(message)
-        }
     }
 }

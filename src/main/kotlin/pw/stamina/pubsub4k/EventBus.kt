@@ -18,6 +18,7 @@ package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
 import pw.stamina.pubsub4k.publish.StandardPublisherRegistry
+import pw.stamina.pubsub4k.subscribe.CancellableMessageHandler
 import pw.stamina.pubsub4k.subscribe.MessageHandler
 import pw.stamina.pubsub4k.subscribe.StandardSubscriptionRegistry
 import pw.stamina.pubsub4k.subscribe.Subscription
@@ -34,6 +35,8 @@ interface EventBus {
     fun removeAllSubscriptions(subscriber: MessageSubscriber)
 
     fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>)
+
+    fun <T : Any> cancellableOn(topic: Topic<T>, subscriber: MessageSubscriber, handler: CancellableMessageHandler<T>)
 
     fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>)
 

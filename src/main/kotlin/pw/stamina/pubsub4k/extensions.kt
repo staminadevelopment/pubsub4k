@@ -17,6 +17,7 @@
 package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
+import pw.stamina.pubsub4k.subscribe.CancellableMessageHandler.Companion.newCancellableHandler
 import pw.stamina.pubsub4k.subscribe.MessageHandler.Companion.newHandler
 
 /**
@@ -29,6 +30,13 @@ inline fun <reified T : Any> EventBus.getPublisher(): Publisher<T> {
 
 inline fun <reified T : Any> EventBus.on(subscriber: MessageSubscriber, crossinline handler: (T) -> Unit) {
     on(T::class.java, subscriber, newHandler(handler))
+}
+
+inline fun <reified T : Any> EventBus.cancellableOn(
+    subscriber: MessageSubscriber,
+    crossinline handler: (T) -> Boolean
+) {
+    cancellableOn(T::class.java, subscriber, newCancellableHandler(handler))
 }
 
 inline fun <reified T : Any> EventBus.once(subscriber: MessageSubscriber, crossinline handler: (T) -> Unit) {
