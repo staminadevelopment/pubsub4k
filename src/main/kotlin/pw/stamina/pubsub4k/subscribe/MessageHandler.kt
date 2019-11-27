@@ -16,15 +16,14 @@
 
 package pw.stamina.pubsub4k.subscribe
 
-import pw.stamina.pubsub4k.MessageSubscriber
+interface MessageHandler<T : Any> {
 
-class Subscription<T : Any>(
-    val topic: Class<T>,
-    val subscriber: MessageSubscriber,
-    val topicFilter: TopicFilter<T>?,
-    /**
-     * Handler function for the messages received by this
-     * subscription.
-     */
-    val messageHandler: MessageHandler<T>
-)
+    fun handle(message: T)
+
+    companion object {
+        inline fun <T : Any> newHandler(crossinline handler: (T) -> Unit) =
+            object : MessageHandler<T> {
+                override fun handle(message: T) = handler.invoke(message)
+            }
+    }
+}

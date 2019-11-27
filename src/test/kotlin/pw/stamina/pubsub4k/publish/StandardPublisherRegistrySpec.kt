@@ -16,11 +16,7 @@
 
 package pw.stamina.pubsub4k.publish
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.stub
-import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldEqual
@@ -28,7 +24,7 @@ import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import pw.stamina.pubsub4k.Topic
 import pw.stamina.pubsub4k.subscribe.Subscription
-import java.util.function.Predicate
+import pw.stamina.pubsub4k.subscribe.TopicFilter
 
 object StandardPublisherRegistrySpec : Spek({
 
@@ -154,7 +150,7 @@ object StandardPublisherRegistrySpec : Spek({
                 }
 
                 describe("with topic filter") {
-                    val topicFilter by memoized { mock<Predicate<Class<out CharSequence>>>() }
+                    val topicFilter by memoized { mock<TopicFilter<CharSequence>>() }
 
                     beforeEach {
                         subscription.stub {
@@ -168,15 +164,15 @@ object StandardPublisherRegistrySpec : Spek({
                         }
 
                         it("topic filter should be tested on topics") {
-                            verify(topicFilter).test(topic)
-                            verify(topicFilter).test(subtopic)
+                            verify(topicFilter).testTopic(topic)
+                            verify(topicFilter).testTopic(subtopic)
                         }
                     }
 
                     describe("topic filter rejects all") {
                         beforeEach {
                             topicFilter.stub {
-                                on { test(any()) } doReturn false
+                                on { testTopic(any()) } doReturn false
                             }
                         }
 
@@ -190,7 +186,7 @@ object StandardPublisherRegistrySpec : Spek({
                     describe("topic filter accepts all") {
                         beforeEach {
                             topicFilter.stub {
-                                on { test(any()) } doReturn true
+                                on { testTopic(any()) } doReturn true
                             }
                         }
 

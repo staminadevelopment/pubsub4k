@@ -59,7 +59,7 @@ class StandardPublisherRegistry : PublisherRegistry {
                 @Suppress("UNCHECKED_CAST")
                 val castedPublisher = publisher as MutablePublisher<T>
 
-                if (subscription.topicFilter?.test(castedPublisher.topic) != false) {
+                if (subscription.topicFilter?.testTopic(castedPublisher.topic) != false) {
                     action(castedPublisher)
                 }
             }

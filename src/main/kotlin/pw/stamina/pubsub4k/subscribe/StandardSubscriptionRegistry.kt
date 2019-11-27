@@ -40,7 +40,7 @@ class StandardSubscriptionRegistry : SubscriptionRegistry {
             .filter { topic.isSubtopicOf(it.topic) }
             .filterIsInstance<Subscription<T>>()
             .filterTo(mutableSetOf()) {
-                it.topicFilter?.test(topic) != false
+                it.topicFilter?.testTopic(topic) != false
             }
     }
 }

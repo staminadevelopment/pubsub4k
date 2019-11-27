@@ -73,7 +73,7 @@ internal class SingleSubscriptionPublisher<T : Any>(
 
     override fun publish(message: T) {
         try {
-            messageHandler.accept(message)
+            messageHandler.handle(message)
         } catch (e: Exception) {
             throw PublicationException(subscription, e)
         }
@@ -93,7 +93,7 @@ internal class ManySubscriptionsPublisher<T : Any>(
 
     override fun publish(message: T) {
         /*
-         * We pass a Consumer instance to use the Iterable#forEach
+         * We pass a MessageHandler instance to use the Iterable#forEach
          * method from Java instead of the Kotlin version, because
          * ArrayList provides an optimized version that internally
          * iterates its array of elements.
@@ -102,7 +102,7 @@ internal class ManySubscriptionsPublisher<T : Any>(
         */
         subscriptions.forEach(Consumer { subscription ->
             try {
-                subscription.messageHandler.accept(message)
+                subscription.messageHandler.handle(message)
             } catch (e: Exception) {
                 throw PublicationException(subscription, e)
             }

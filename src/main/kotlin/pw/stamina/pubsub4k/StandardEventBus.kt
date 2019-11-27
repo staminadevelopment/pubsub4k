@@ -18,9 +18,9 @@ package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
 import pw.stamina.pubsub4k.publish.PublisherRegistry
+import pw.stamina.pubsub4k.subscribe.MessageHandler
 import pw.stamina.pubsub4k.subscribe.Subscription
 import pw.stamina.pubsub4k.subscribe.SubscriptionRegistry
-import java.util.function.Consumer
 
 class StandardEventBus(
     private val subscriptions: SubscriptionRegistry,
@@ -45,15 +45,15 @@ class StandardEventBus(
         unregisteredSubscriptions.forEach { publishers.removeSubscriptionFromPublishers(it) }
     }
 
-    override fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>) {
+    override fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>) {
         addSubscription(Subscription(topic, subscriber, null, handler))
     }
 
-    override fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>) {
-        val subscriptionRemovingConsumer = SubscriptionRemovingConsumer(this, handler)
-        val subscription = Subscription(topic, subscriber, null, subscriptionRemovingConsumer)
+    override fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>) {
+        val subscriptionRemovingMessageHandler = SubscriptionRemovingMessageHandler(this, handler)
+        val subscription = Subscription(topic, subscriber, null, subscriptionRemovingMessageHandler)
 
-        subscriptionRemovingConsumer.subscription = subscription
+        subscriptionRemovingMessageHandler.subscription = subscription
 
         addSubscription(subscription)
     }
@@ -66,15 +66,15 @@ class StandardEventBus(
         publishers.removePublisher(topic)
     }
 
-    class SubscriptionRemovingConsumer<T : Any>(
+    class SubscriptionRemovingMessageHandler<T : Any>(
         private val bus: EventBus,
-        private val handler: Consumer<T>
-    ) : Consumer<T> {
+        private val handler: MessageHandler<T>
+    ) : MessageHandler<T> {
         internal lateinit var subscription: Subscription<T>
 
-        override fun accept(message: T) {
+        override fun handle(message: T) {
             bus.removeSubscription(subscription)
-            handler.accept(message)
+            handler.handle(message)
         }
     }
 }

@@ -17,7 +17,7 @@
 package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
-import java.util.function.Consumer
+import pw.stamina.pubsub4k.subscribe.MessageHandler.Companion.newHandler
 
 /**
  * Returns the publisher associated with the [T] topic, if
@@ -28,9 +28,9 @@ inline fun <reified T : Any> EventBus.getPublisher(): Publisher<T> {
 }
 
 inline fun <reified T : Any> EventBus.on(subscriber: MessageSubscriber, crossinline handler: (T) -> Unit) {
-    on(T::class.java, subscriber, Consumer { handler(it) })
+    on(T::class.java, subscriber, newHandler(handler))
 }
 
 inline fun <reified T : Any> EventBus.once(subscriber: MessageSubscriber, crossinline handler: (T) -> Unit) {
-    once(T::class.java, subscriber, Consumer { handler(it) })
+    once(T::class.java, subscriber, newHandler(handler))
 }

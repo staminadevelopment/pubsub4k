@@ -17,10 +17,10 @@
 package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
+import pw.stamina.pubsub4k.subscribe.MessageHandler
 import pw.stamina.pubsub4k.subscribe.Subscription
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
-import java.util.function.Consumer
 import kotlin.concurrent.withLock
 
 internal class LockingEventBus(
@@ -40,11 +40,11 @@ internal class LockingEventBus(
         bus.removeAllSubscriptions(subscriber)
     }
 
-    override fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>) = lock.withLock {
+    override fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>) = lock.withLock {
         bus.on(topic, subscriber, handler)
     }
 
-    override fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>) = lock.withLock {
+    override fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>) = lock.withLock {
         bus.once(topic, subscriber, handler)
     }
 

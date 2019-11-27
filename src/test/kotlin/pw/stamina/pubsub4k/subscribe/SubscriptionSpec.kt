@@ -21,17 +21,14 @@ import org.amshove.kluent.shouldBe
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import pw.stamina.pubsub4k.MessageSubscriber
-import pw.stamina.pubsub4k.Topic
-import java.util.function.Consumer
-import java.util.function.Predicate
 
 object SubscriptionSpec : Spek({
     describe("A subscription") {
         val topic = Any::class.java
 
         val subscriber by memoized { mock<MessageSubscriber>() }
-        val topicFilter by memoized { mock<Predicate<Topic<out Any>>>() }
-        val messageHandler by memoized { mock<Consumer<Any>>() }
+        val topicFilter by memoized { mock<TopicFilter<Any>>() }
+        val messageHandler by memoized { mock<MessageHandler<Any>>() }
 
         val subscription by memoized { Subscription(topic, subscriber, topicFilter, messageHandler) }
 

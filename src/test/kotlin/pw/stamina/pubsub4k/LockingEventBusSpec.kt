@@ -26,8 +26,8 @@ import org.mockito.Mockito
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import pw.stamina.pubsub4k.publish.Publisher
+import pw.stamina.pubsub4k.subscribe.MessageHandler
 import pw.stamina.pubsub4k.subscribe.Subscription
-import java.util.function.Consumer
 
 object LockingEventBusSpec : Spek({
     describe("A locking event bus") {
@@ -68,7 +68,7 @@ object LockingEventBusSpec : Spek({
 
         describe("adding subscription using on") {
             val topic = Any::class.java
-            val handler = Consumer<Any> {}
+            val handler = MessageHandler.newHandler<Any> {}
             val subscriber by memoized { mock<MessageSubscriber>() }
 
             it("should add subscription to parent bus using on") {
@@ -79,7 +79,7 @@ object LockingEventBusSpec : Spek({
 
         describe("adding subscription using once") {
             val topic = Any::class.java
-            val handler = Consumer<Any> {}
+            val handler = MessageHandler.newHandler<Any> {}
             val subscriber by memoized { mock<MessageSubscriber>() }
 
             it("should add subscription to parent bus using once") {

@@ -56,7 +56,7 @@ object ManySubscriptionPublisherSpec : Spek({
 
                 it("should call message handler of subscriptions") {
                     subscriptions.forEach { subscription ->
-                        verify(subscription.messageHandler).accept(message)
+                        verify(subscription.messageHandler).handle(message)
                     }
                 }
             }

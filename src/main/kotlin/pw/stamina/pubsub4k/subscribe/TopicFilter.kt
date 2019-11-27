@@ -16,15 +16,16 @@
 
 package pw.stamina.pubsub4k.subscribe
 
-import pw.stamina.pubsub4k.MessageSubscriber
+import pw.stamina.pubsub4k.Topic
 
-class Subscription<T : Any>(
-    val topic: Class<T>,
-    val subscriber: MessageSubscriber,
-    val topicFilter: TopicFilter<T>?,
-    /**
-     * Handler function for the messages received by this
-     * subscription.
-     */
-    val messageHandler: MessageHandler<T>
-)
+interface TopicFilter<T : Any> {
+
+    fun testTopic(topic: Topic<out T>): Boolean
+
+    companion object {
+        inline fun <T : Any> newFilter(crossinline filter: (Topic<out T>) -> Boolean) =
+            object : TopicFilter<T> {
+                override fun testTopic(topic: Topic<out T>) = filter.invoke(topic)
+            }
+    }
+}

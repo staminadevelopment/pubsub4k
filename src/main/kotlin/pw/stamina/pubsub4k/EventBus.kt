@@ -18,9 +18,9 @@ package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
 import pw.stamina.pubsub4k.publish.StandardPublisherRegistry
+import pw.stamina.pubsub4k.subscribe.MessageHandler
 import pw.stamina.pubsub4k.subscribe.StandardSubscriptionRegistry
 import pw.stamina.pubsub4k.subscribe.Subscription
-import java.util.function.Consumer
 
 /**
  * The event bus is the central object
@@ -33,9 +33,9 @@ interface EventBus {
 
     fun removeAllSubscriptions(subscriber: MessageSubscriber)
 
-    fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>)
+    fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>)
 
-    fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: Consumer<T>)
+    fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>)
 
     /**
      * Returns the publisher associated with the [topic], if

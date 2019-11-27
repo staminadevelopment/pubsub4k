@@ -47,7 +47,7 @@ object SingleSubscriptionPublisherSpec : Spek({
             }
 
             it("should call message handler of subscription") {
-                verify(subscription.messageHandler).accept(message)
+                verify(subscription.messageHandler).handle(message)
             }
         }
 
