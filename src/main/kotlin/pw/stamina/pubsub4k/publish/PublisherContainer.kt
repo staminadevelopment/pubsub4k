@@ -33,7 +33,7 @@ import pw.stamina.pubsub4k.subscribe.Subscription
 class PublisherContainer<T : Any>(
     override val topic: Topic<T>,
     subscriptions: Set<Subscription<T>>
-) : MutablePublisher<T> {
+) : Publisher<T> {
 
     private var publisher = OptimizedPublisher.fromSubscriptions(subscriptions)
 

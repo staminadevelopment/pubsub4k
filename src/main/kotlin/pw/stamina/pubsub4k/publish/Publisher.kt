@@ -28,15 +28,20 @@ import pw.stamina.pubsub4k.subscribe.Subscription
  */
 interface Publisher<T : Any> {
 
-    /**
-     * The topic of this publisher.
-     */
+    /** The topic of this publisher. */
     val topic: Topic<T>
 
-    /**
-     * The subscriptions registered for this publisher.
-     */
+    /** The subscriptions registered for this publisher. */
     val subscriptions: Set<Subscription<T>>
+
+    /** Adds the [subscription] to this publisher. */
+    fun add(subscription: Subscription<T>)
+
+    /** Removes the [subscription] from this publisher. */
+    fun remove(subscription: Subscription<T>)
+
+    /** Clears all the [subscriptions] from this publisher. */
+    fun clear()
 
     /**
      * Publishes the [message] to all its [subscriptions]. If

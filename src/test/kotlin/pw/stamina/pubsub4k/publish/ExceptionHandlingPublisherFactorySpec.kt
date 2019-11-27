@@ -14,48 +14,35 @@
  * limitations under the License.
  */
 
-package pw.stamina.pubsub4k
+package pw.stamina.pubsub4k.publish
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.doThrow
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.stub
-import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.*
 import org.amshove.kluent.mock
-import org.amshove.kluent.shouldBeInstanceOf
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import pw.stamina.pubsub4k.publish.PublicationException
-import pw.stamina.pubsub4k.publish.Publisher
 
-object ExceptionHandlingEventBusSpec : Spek({
+object ExceptionHandlingPublisherFactorySpec : Spek({
 
-    describe("An exception handling event bus") {
+    describe("An exception handling publisher factory") {
 
         val expectedException by memoized { mock<PublicationException>() }
         val mockedPublisher by memoized { mock<Publisher<Any>>() }
-        val mockedBus by memoized {
-            mock<EventBus> {
-                on { getPublisher<Any>() } doReturn mockedPublisher
+        val exceptionHandler by memoized { mock<ExceptionHandler>() }
+        val mockedFactory by memoized {
+            mock<PublisherFactory> {
+                on { createPublisher<Any>(any(), any()) } doReturn mockedPublisher
             }
         }
-
-        val exceptionHandler by memoized { mock<ExceptionHandler>() }
-        val bus by memoized { ExceptionHandlingEventBus(mockedBus, exceptionHandler) }
+        val factory by memoized { ExceptionHandlingPublisherFactory(mockedFactory, exceptionHandler) }
 
         describe("getting a publisher") {
 
-            val publisher by memoized { bus.getPublisher<Any>() }
-
-            it("should be an exception handling publisher") {
-                publisher.shouldBeInstanceOf<ExceptionHandlingPublisher<Any>>()
-            }
+            val publisher by memoized { factory.createPublisher(Any::class.java, emptySet()) }
 
             describe("publishing message") {
                 val message by memoized { Any() }
 
-                describe("with normal mocked publisher") {
+                describe("with non-mocking mocked publisher") {
                     beforeEach {
                         publisher.publish(message)
                     }

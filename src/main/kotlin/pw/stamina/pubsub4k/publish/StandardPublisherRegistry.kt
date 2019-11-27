@@ -20,9 +20,9 @@ import pw.stamina.pubsub4k.Topic
 import pw.stamina.pubsub4k.isSubtopicOf
 import pw.stamina.pubsub4k.subscribe.Subscription
 
-class StandardPublisherRegistry : PublisherRegistry {
+class StandardPublisherRegistry(private val publisherFactory: PublisherFactory) : PublisherRegistry {
 
-    private val publisherLookupMap = mutableMapOf<Topic<*>, MutablePublisher<*>>()
+    private val publisherLookupMap = mutableMapOf<Topic<*>, Publisher<*>>()
 
     override fun <T : Any> findPublisher(topic: Topic<T>): Publisher<T>? {
         @Suppress("UNCHECKED_CAST")
@@ -32,10 +32,10 @@ class StandardPublisherRegistry : PublisherRegistry {
     override fun <T : Any> findOrCreatePublisher(
         topic: Topic<T>, subscriptions: (Topic<T>) -> Set<Subscription<T>>
     ): Publisher<T> {
-        val publisherCreator = { PublisherContainer(topic, subscriptions(topic)) }
-
         @Suppress("UNCHECKED_CAST")
-        return publisherLookupMap.getOrPut(topic, publisherCreator) as Publisher<T>
+        return publisherLookupMap.getOrPut(topic, {
+            publisherFactory.createPublisher(topic, subscriptions(topic))
+        }) as Publisher<T>
     }
 
     override fun <T : Any> findPublishersFor(subscription: Subscription<T>): Set<Publisher<T>> {
@@ -52,12 +52,12 @@ class StandardPublisherRegistry : PublisherRegistry {
 
     private fun <T : Any> forEachPublisherFor(
         subscription: Subscription<T>,
-        action: (MutablePublisher<T>) -> Unit
+        action: (Publisher<T>) -> Unit
     ) {
         publisherLookupMap.values.forEach { publisher ->
             if (publisher.topic.isSubtopicOf(subscription.topic)) {
                 @Suppress("UNCHECKED_CAST")
-                val castedPublisher = publisher as MutablePublisher<T>
+                val castedPublisher = publisher as Publisher<T>
 
                 if (subscription.topicFilter?.testTopic(castedPublisher.topic) != false) {
                     action(castedPublisher)

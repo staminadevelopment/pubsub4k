@@ -16,16 +16,11 @@
 
 package pw.stamina.pubsub4k.publish
 
+import pw.stamina.pubsub4k.Topic
 import pw.stamina.pubsub4k.subscribe.Subscription
 
-interface MutablePublisher<T : Any> : Publisher<T> {
+internal object OptimizedPublisherFactory : PublisherFactory {
 
-    /** Adds the [subscription] to this publisher. */
-    fun add(subscription: Subscription<T>)
-
-    /** Removes the [subscription] from this publisher. */
-    fun remove(subscription: Subscription<T>)
-
-    /** Clears all the [subscriptions] from this publisher. */
-    fun clear()
+    override fun <T : Any> createPublisher(topic: Topic<T>, subscriptions: Set<Subscription<T>>) =
+        PublisherContainer(topic, subscriptions)
 }

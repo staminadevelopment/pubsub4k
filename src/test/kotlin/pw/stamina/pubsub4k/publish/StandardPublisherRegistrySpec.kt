@@ -29,7 +29,9 @@ import pw.stamina.pubsub4k.subscribe.TopicFilter
 object StandardPublisherRegistrySpec : Spek({
 
     describe("A standard publisher registry") {
-        val registry by memoized { StandardPublisherRegistry() }
+        //TODO: Mock publisher factory, and add test cases for it
+        val publisherFactory = PublisherFactory.optimized()
+        val registry by memoized { StandardPublisherRegistry(publisherFactory) }
 
         describe("no publishers created") {
             val topic: Topic<Any> = Any::class.java

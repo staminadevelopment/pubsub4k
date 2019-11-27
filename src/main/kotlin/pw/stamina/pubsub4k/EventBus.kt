@@ -17,6 +17,7 @@
 package pw.stamina.pubsub4k
 
 import pw.stamina.pubsub4k.publish.Publisher
+import pw.stamina.pubsub4k.publish.PublisherFactory
 import pw.stamina.pubsub4k.publish.StandardPublisherRegistry
 import pw.stamina.pubsub4k.subscribe.CancellableMessageHandler
 import pw.stamina.pubsub4k.subscribe.MessageHandler
@@ -59,8 +60,9 @@ interface EventBus {
          */
         @JvmStatic
         fun createDefaultBus(locking: Boolean = true): EventBus {
+            val publisherFactory = PublisherFactory.optimized()
             val subscriptions = StandardSubscriptionRegistry()
-            val publishers = StandardPublisherRegistry()
+            val publishers = StandardPublisherRegistry(publisherFactory)
 
             val bus = StandardEventBus(subscriptions, publishers)
 

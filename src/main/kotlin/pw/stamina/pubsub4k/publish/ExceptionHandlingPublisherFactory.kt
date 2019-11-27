@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package pw.stamina.pubsub4k
+package pw.stamina.pubsub4k.publish
 
-import pw.stamina.pubsub4k.publish.PublicationException
-import pw.stamina.pubsub4k.publish.Publisher
+import pw.stamina.pubsub4k.Topic
+import pw.stamina.pubsub4k.subscribe.Subscription
 
-internal class ExceptionHandlingEventBus(
-    private val bus: EventBus,
+class ExceptionHandlingPublisherFactory(
+    private val factory: PublisherFactory,
     private val exceptionHandler: ExceptionHandler
-) : EventBus by bus {
+) : PublisherFactory {
 
-    override fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T> {
-        val publisher = bus.getPublisher(topic)
+    override fun <T : Any> createPublisher(topic: Topic<T>, subscriptions: Set<Subscription<T>>): Publisher<T> {
+        val publisher = factory.createPublisher(topic, subscriptions)
         return ExceptionHandlingPublisher(publisher, exceptionHandler)
     }
 }
 
-internal class ExceptionHandlingPublisher<T : Any>(
+private class ExceptionHandlingPublisher<T : Any>(
     private val publisher: Publisher<T>,
     private val exceptionHandler: ExceptionHandler
 ) : Publisher<T> by publisher {
@@ -44,6 +44,5 @@ internal class ExceptionHandlingPublisher<T : Any>(
 
 internal typealias ExceptionHandler = (exception: PublicationException) -> Unit
 
-fun EventBus.withExceptionHandling(exceptionHandler: ExceptionHandler): EventBus {
-    return ExceptionHandlingEventBus(this, exceptionHandler)
-}
+fun PublisherFactory.exceptionHandling(exceptionHandler: ExceptionHandler): PublisherFactory =
+    ExceptionHandlingPublisherFactory(this, exceptionHandler)
