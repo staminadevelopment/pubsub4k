@@ -28,26 +28,6 @@ interface MessageHandler<T : Any> {
     }
 }
 
-class CancellableSubscription<T : Any>(
-    val handler: CancellableMessageHandler<T>
-) {
-
-}
-
-/*
-class CancellableMessageHandler<T : Any>(
-    private val handler: MessageHandler<T>
-) : MessageHandler<T> {
-    lateinit var cancel: () -> Unit
-
-    override fun handle(message: T) {
-        cancel()
-        handler.handle(message)
-    }
-
-}
-*/
-
 interface CancellableMessageHandler<T : Any> : MessageHandler<T> {
 
     var cancel: () -> Unit
