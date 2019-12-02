@@ -52,10 +52,4 @@ interface PublisherRegistry {
     fun <T : Any> addSubscriptionToPublishers(subscription: Subscription<T>)
 
     fun <T : Any> removeSubscriptionFromPublishers(subscription: Subscription<T>)
-
-    /**
-     * Removes the publisher associated with the specified
-     * [topic], and clears all its subscriptions.
-     */
-    fun removePublisher(topic: Topic<*>): Boolean
 }

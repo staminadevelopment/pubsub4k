@@ -50,8 +50,6 @@ interface EventBus {
      */
     fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T>
 
-    fun disposePublisher(topic: Topic<*>)
-
     companion object {
 
         /**

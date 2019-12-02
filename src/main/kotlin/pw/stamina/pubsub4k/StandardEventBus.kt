@@ -74,8 +74,4 @@ class StandardEventBus(
     override fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T> {
         return publishers.findOrCreatePublisher(topic, subscriptions::findSubscriptionsForTopic)
     }
-
-    override fun disposePublisher(topic: Topic<*>) {
-        publishers.removePublisher(topic)
-    }
 }

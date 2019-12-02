@@ -44,14 +44,6 @@ object StandardPublisherRegistrySpec : Spek({
                 }
             }
 
-            describe("removing publisher by topic") {
-                val removed by memoized { registry.removePublisher(topic) }
-
-                it("should return false") {
-                    removed shouldBe false
-                }
-            }
-
             describe("find or create publisher") {
                 val subscriptions by memoized { setOf<Subscription<Any>>(mock(), mock(), mock()) }
 
@@ -91,31 +83,6 @@ object StandardPublisherRegistrySpec : Spek({
 
                     it("should return null") {
                         result shouldBe null
-                    }
-                }
-
-                describe("removing publisher by topic") {
-                    // Do not use memoized here
-                    var removed = false
-                    beforeEach {
-                        removed = registry.removePublisher(topic)
-                    }
-
-
-                    it("should return true") {
-                        removed shouldBe true
-                    }
-
-                    describe("finding publisher by topic") {
-                        val result by memoized { registry.findPublisher(topic) }
-
-                        it("should return null") {
-                            result shouldBe null
-                        }
-                    }
-
-                    it("removed publisher should be cleared") {
-                        publisher.subscriptions.shouldBeEmpty()
                     }
                 }
             }

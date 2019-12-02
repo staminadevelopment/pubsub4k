@@ -105,14 +105,5 @@ object LockingEventBusSpec : Spek({
                 verify(parentBus).getPublisher<Any>()
             }
         }
-
-        describe("disposing publisher by topic") {
-            val topic = Any::class.java
-
-            it("should dispose publisher from parent bus by topic") {
-                lockingBus.disposePublisher(topic)
-                verify(parentBus).disposePublisher(topic)
-            }
-        }
     }
 })

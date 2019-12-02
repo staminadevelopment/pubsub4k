@@ -60,10 +60,6 @@ internal class LockingEventBus(
     override fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T> = lock.withLock {
         return bus.getPublisher(topic)
     }
-
-    override fun disposePublisher(topic: Topic<*>) = lock.withLock {
-        bus.disposePublisher(topic)
-    }
 }
 
 fun EventBus.withLocking(lock: Lock = ReentrantLock()): EventBus {
