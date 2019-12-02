@@ -18,43 +18,52 @@ package pw.stamina.pubsub4k.publish
 
 import pw.stamina.pubsub4k.Topic
 import pw.stamina.pubsub4k.isSubtopicOf
+import pw.stamina.pubsub4k.isSupertopicOf
 import pw.stamina.pubsub4k.subscribe.Subscription
 
+@Suppress("UNCHECKED_CAST")
 class StandardPublisherRegistry(private val publisherFactory: PublisherFactory) : PublisherRegistry {
 
-    private val publisherLookupMap = mutableMapOf<Topic<*>, Publisher<*>>()
+    private val publisherLookup = mutableMapOf<Topic<*>, Publisher<*>>()
+    private val topicToPublishersLookup = mutableMapOf<Topic<*>, MutableSet<Publisher<*>>>()
 
     override fun <T : Any> findPublisher(topic: Topic<T>): Publisher<T>? {
-        @Suppress("UNCHECKED_CAST")
-        return publisherLookupMap[topic] as? Publisher<T>
+        return publisherLookup[topic] as? Publisher<T>
     }
 
     override fun <T : Any> findOrCreatePublisher(
         topic: Topic<T>, subscriptions: (Topic<T>) -> Set<Subscription<T>>
     ): Publisher<T> {
-        @Suppress("UNCHECKED_CAST")
-        return publisherLookupMap.getOrPut(topic, {
-            publisherFactory.createPublisher(topic, subscriptions(topic))
+        return publisherLookup.getOrPut(topic, {
+            createAndIndexPublisher(topic, subscriptions(topic))
         }) as Publisher<T>
     }
 
-    override fun <T : Any> findPublishersFor(subscription: Subscription<T>): Set<Publisher<T>> {
-        val matchingPublishers = mutableSetOf<Publisher<T>>()
+    private fun <T : Any> createAndIndexPublisher(
+        topic: Topic<T>,
+        subscriptions: Set<Subscription<T>>
+    ): Publisher<T> {
+        val publisher = publisherFactory.createPublisher(topic, subscriptions)
 
-        publisherLookupMap.values.forEach { publisher ->
-            if (publisher.topic.isSubtopicOf(subscription.topic)) {
-                @Suppress("UNCHECKED_CAST")
-                val castedPublisher = publisher as Publisher<T>
-                matchingPublishers.add(castedPublisher)
-            }
-        }
+        val matchingPublishers = publisherLookup.values
+            .filterTo(mutableSetOf()) { it.topic.isSubtopicOf(topic) }
 
-        return matchingPublishers
+        topicToPublishersLookup[topic] = matchingPublishers
+
+        topicToPublishersLookup
+            .filterKeys { it.isSupertopicOf(topic) }
+            .values.forEach { it.add(publisher) }
+
+        return publisher
+    }
+
+    override fun <T : Any> findPublishersByTopic(topic: Topic<T>): Set<Publisher<T>> {
+        return topicToPublishersLookup[topic] as? Set<Publisher<T>> ?: emptySet()
     }
 
     override fun <T : Any> addSubscriptionToPublishers(subscription: Subscription<T>) =
-        findPublishersFor(subscription).forEach { it.add(subscription) }
+        findPublishersByTopic(subscription.topic).forEach { it.add(subscription) }
 
     override fun <T : Any> removeSubscriptionFromPublishers(subscription: Subscription<T>) =
-        findPublishersFor(subscription).forEach { it.remove(subscription) }
+        findPublishersByTopic(subscription.topic).forEach { it.remove(subscription) }
 }

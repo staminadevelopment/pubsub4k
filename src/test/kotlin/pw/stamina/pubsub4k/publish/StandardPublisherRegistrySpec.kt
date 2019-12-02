@@ -109,8 +109,8 @@ object StandardPublisherRegistrySpec : Spek({
                 }
             }
 
-            describe("find publishers for subscription") {
-                val publishers by memoized { registry.findPublishersFor(subscription) }
+            describe("find publishers by topic") {
+                val publishers by memoized { registry.findPublishersByTopic(topic) }
 
                 it("publishers should contain just publisher and publisherSub") {
                     publishers shouldEqual setOf(publisher, publisherSub)
@@ -118,7 +118,7 @@ object StandardPublisherRegistrySpec : Spek({
             }
 
             describe("add subscription to publishers") {
-                val publishers by memoized { registry.findPublishersFor(subscription) }
+                val publishers by memoized { registry.findPublishersByTopic(topic) }
 
                 beforeEach {
                     registry.addSubscriptionToPublishers(subscription)

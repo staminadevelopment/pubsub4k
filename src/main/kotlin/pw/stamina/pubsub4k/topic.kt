@@ -26,3 +26,5 @@ typealias Topic<T> = Class<T>
  * [Class.isAssignableFrom] from the other topic.
  */
 fun Topic<*>.isSubtopicOf(other: Topic<*>) = other.isAssignableFrom(this)
+
+fun Topic<*>.isSupertopicOf(other: Topic<*>) = other.isSubtopicOf(this)

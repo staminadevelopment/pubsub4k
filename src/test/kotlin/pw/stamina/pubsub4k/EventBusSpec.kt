@@ -83,5 +83,19 @@ object TopicSpec : Spek({
                 topic.isSubtopicOf(subtopic) shouldBe false
             }
         }
+
+        describe("isSupertopicOf") {
+            it("should return true for same topic") {
+                topic.isSupertopicOf(topic) shouldBe true
+            }
+
+            it("should return false for supertopic") {
+                topic.isSupertopicOf(supertopic) shouldBe false
+            }
+
+            it("should return true for subtopic") {
+                topic.isSupertopicOf(subtopic) shouldBe true
+            }
+        }
     }
 })

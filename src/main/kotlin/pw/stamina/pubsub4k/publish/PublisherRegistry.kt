@@ -37,14 +37,7 @@ interface PublisherRegistry {
         subscriptions: ((Topic<T>) -> Set<Subscription<T>>)
     ): Publisher<T>
 
-    /**
-     * Finds all the publishers which topic is accepted by
-     * the specified [subscription]. The [subscription]
-     * accepts the topic if its own topic is a subtopic of
-     * the publisher's topic and its [topic filter][Subscription.topicFilter]
-     * is not null and accepts the topic.
-     */
-    fun <T : Any> findPublishersFor(subscription: Subscription<T>): Set<Publisher<T>>
+    fun <T : Any> findPublishersByTopic(topic: Topic<T>): Set<Publisher<T>>
 
     /**
      * Adds the subscription from all publishers
