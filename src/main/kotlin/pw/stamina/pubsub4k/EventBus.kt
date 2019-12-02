@@ -39,8 +39,6 @@ interface EventBus {
 
     fun <T : Any> cancellableOn(topic: Topic<T>, subscriber: MessageSubscriber, handler: CancellableMessageHandler<T>)
 
-    fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>)
-
     /**
      * Returns the publisher associated with the [topic], if
      * a publisher does not already exist a new one is created.

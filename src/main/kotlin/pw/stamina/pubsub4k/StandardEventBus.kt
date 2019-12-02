@@ -64,13 +64,6 @@ class StandardEventBus(
         addSubscription(subscription)
     }
 
-    override fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>) {
-        cancellableOn(topic, subscriber, CancellableMessageHandler.newCancellableHandler {
-            handler.handle(it)
-            true
-        })
-    }
-
     override fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T> {
         return publishers.findOrCreatePublisher(topic, subscriptions::findSubscriptionsForTopic)
     }

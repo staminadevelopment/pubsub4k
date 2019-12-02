@@ -53,10 +53,6 @@ internal class LockingEventBus(
         bus.cancellableOn(topic, subscriber, handler)
     }
 
-    override fun <T : Any> once(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>) = lock.withLock {
-        bus.once(topic, subscriber, handler)
-    }
-
     override fun <T : Any> getPublisher(topic: Topic<T>): Publisher<T> = lock.withLock {
         return bus.getPublisher(topic)
     }

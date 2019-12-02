@@ -26,6 +26,8 @@ import org.mockito.Mockito
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import pw.stamina.pubsub4k.publish.Publisher
+import pw.stamina.pubsub4k.subscribe.CancellableMessageHandler
+import pw.stamina.pubsub4k.subscribe.CancellableMessageHandler.Companion.newCancellableHandler
 import pw.stamina.pubsub4k.subscribe.MessageHandler
 import pw.stamina.pubsub4k.subscribe.Subscription
 
@@ -77,14 +79,14 @@ object LockingEventBusSpec : Spek({
             }
         }
 
-        describe("adding subscription using once") {
+        describe("adding cancellable subscription") {
             val topic = Any::class.java
-            val handler = MessageHandler.newHandler<Any> {}
+            val handler = newCancellableHandler<Any> { false }
             val subscriber by memoized { mock<MessageSubscriber>() }
 
             it("should add subscription to parent bus using once") {
-                lockingBus.once(topic, subscriber, handler)
-                verify(parentBus).once(topic, subscriber, handler)
+                lockingBus.cancellableOn(topic, subscriber, handler)
+                verify(parentBus).cancellableOn(topic, subscriber, handler)
             }
         }
 

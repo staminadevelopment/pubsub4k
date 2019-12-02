@@ -40,5 +40,8 @@ inline fun <reified T : Any> EventBus.cancellableOn(
 }
 
 inline fun <reified T : Any> EventBus.once(subscriber: MessageSubscriber, crossinline handler: (T) -> Unit) {
-    once(T::class.java, subscriber, newHandler(handler))
+    cancellableOn<T>(subscriber) {
+        handler(it)
+        true
+    }
 }
