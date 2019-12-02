@@ -27,10 +27,9 @@ object SubscriptionSpec : Spek({
         val topic = Any::class.java
 
         val subscriber by memoized { mock<MessageSubscriber>() }
-        val topicFilter by memoized { mock<TopicFilter<Any>>() }
         val messageHandler by memoized { mock<MessageHandler<Any>>() }
 
-        val subscription by memoized { Subscription(topic, subscriber, topicFilter, messageHandler) }
+        val subscription by memoized { Subscription(topic, subscriber, messageHandler) }
 
         it("topic should be specified topic") {
             subscription.topic shouldBe topic
@@ -38,10 +37,6 @@ object SubscriptionSpec : Spek({
 
         it("subscriber should be specified subscriber") {
             subscription.subscriber shouldBe subscriber
-        }
-
-        it("topicFilter should be specified topicFilter") {
-            subscription.topicFilter shouldBe topicFilter
         }
 
         it("messageHandler should be specified messageHandler") {

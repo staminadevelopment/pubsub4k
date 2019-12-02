@@ -45,10 +45,7 @@ class StandardPublisherRegistry(private val publisherFactory: PublisherFactory) 
             if (publisher.topic.isSubtopicOf(subscription.topic)) {
                 @Suppress("UNCHECKED_CAST")
                 val castedPublisher = publisher as Publisher<T>
-
-                if (subscription.topicFilter?.testTopic(castedPublisher.topic) != false) {
-                    matchingPublishers.add(castedPublisher)
-                }
+                matchingPublishers.add(castedPublisher)
             }
         }
 

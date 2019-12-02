@@ -21,7 +21,6 @@ import pw.stamina.pubsub4k.MessageSubscriber
 class Subscription<T : Any>(
     val topic: Class<T>,
     val subscriber: MessageSubscriber,
-    val topicFilter: TopicFilter<T>?,
     /**
      * Handler function for the messages received by this
      * subscription.

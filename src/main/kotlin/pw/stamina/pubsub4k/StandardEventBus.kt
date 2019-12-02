@@ -47,7 +47,7 @@ class StandardEventBus(
     }
 
     override fun <T : Any> on(topic: Topic<T>, subscriber: MessageSubscriber, handler: MessageHandler<T>) {
-        addSubscription(Subscription(topic, subscriber, null, handler))
+        addSubscription(Subscription(topic, subscriber, handler))
     }
 
     override fun <T : Any> cancellableOn(
@@ -55,7 +55,7 @@ class StandardEventBus(
         subscriber: MessageSubscriber,
         handler: CancellableMessageHandler<T>
     ) {
-        val subscription = Subscription(topic, subscriber, null, handler)
+        val subscription = Subscription(topic, subscriber, handler)
 
         handler.cancel = {
             removeSubscription(subscription)

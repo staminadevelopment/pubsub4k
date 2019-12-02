@@ -16,7 +16,8 @@
 
 package pw.stamina.pubsub4k.publish
 
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldEqual
@@ -24,7 +25,6 @@ import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import pw.stamina.pubsub4k.Topic
 import pw.stamina.pubsub4k.subscribe.Subscription
-import pw.stamina.pubsub4k.subscribe.TopicFilter
 
 object StandardPublisherRegistrySpec : Spek({
 
@@ -110,61 +110,10 @@ object StandardPublisherRegistrySpec : Spek({
             }
 
             describe("find publishers for subscription") {
-                describe("with no topic filter") {
-                    val publishers by memoized { registry.findPublishersFor(subscription) }
+                val publishers by memoized { registry.findPublishersFor(subscription) }
 
-                    it("publishers should contain just publisher and publisherSub") {
-                        publishers shouldEqual setOf(publisher, publisherSub)
-                    }
-                }
-
-                describe("with topic filter") {
-                    val topicFilter by memoized { mock<TopicFilter<CharSequence>>() }
-
-                    beforeEach {
-                        subscription.stub {
-                            on { this.topicFilter } doReturn topicFilter
-                        }
-                    }
-
-                    describe("any topic filter") {
-                        beforeEach {
-                            registry.findPublishersFor(subscription)
-                        }
-
-                        it("topic filter should be tested on topics") {
-                            verify(topicFilter).testTopic(topic)
-                            verify(topicFilter).testTopic(subtopic)
-                        }
-                    }
-
-                    describe("topic filter rejects all") {
-                        beforeEach {
-                            topicFilter.stub {
-                                on { testTopic(any()) } doReturn false
-                            }
-                        }
-
-                        val publishers by memoized { registry.findPublishersFor(subscription) }
-
-                        it("publishers should be empty") {
-                            publishers.shouldBeEmpty()
-                        }
-                    }
-
-                    describe("topic filter accepts all") {
-                        beforeEach {
-                            topicFilter.stub {
-                                on { testTopic(any()) } doReturn true
-                            }
-                        }
-
-                        val publishers by memoized { registry.findPublishersFor(subscription) }
-
-                        it("publishers should contain just publisher and publisherSub") {
-                            publishers shouldEqual setOf(publisher, publisherSub)
-                        }
-                    }
+                it("publishers should contain just publisher and publisherSub") {
+                    publishers shouldEqual setOf(publisher, publisherSub)
                 }
             }
 
